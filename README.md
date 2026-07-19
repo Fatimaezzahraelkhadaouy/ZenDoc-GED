@@ -1,25 +1,24 @@
 <div align="center">
 
-<img src="banner.png" alt="ZenDoc" width="800"/>
-
-# 📄 ZenDoc
+# <img src="logo.png" alt="ZenDoc logo" width="40" height="40" valign="middle"/> ZenDoc
 
 ### AI-Powered Electronic Document Management System
 
 **A full-stack application combining NLP, vector search, and LLM orchestration to automate document classification, semantic retrieval, and Retrieval-Augmented Generation (RAG).**
 
+<img src="banner.png" alt="ZenDoc" width="800"/>
+
 [![Python](https://img.shields.io/badge/Python-3.10+-3776AB?logo=python&logoColor=white)](https://www.python.org/)
 [![Flask](https://img.shields.io/badge/Flask-2.x-000000?logo=flask&logoColor=white)](https://flask.palletsprojects.com/)
 [![SQLAlchemy](https://img.shields.io/badge/SQLAlchemy-ORM-D71F00)](https://www.sqlalchemy.org/)
 [![LangChain](https://img.shields.io/badge/LangChain-Orchestration-1C3C3C)](https://www.langchain.com/)
-[![ChromaDB](https://img.shields.io/badge/ChromaDB-Vector%20DB-7C3AED)](https://www.trychroma.com/)
-[![Gemini API](https://img.shields.io/badge/Gemini-LLM%20API-4285F4?logo=googlegemini&logoColor=white)](https://ai.google.dev/)
+[![ChromaDB](https://img.shields.io/badge/ChromaDB-Vector_DB-7C3AED)](https://www.trychroma.com/)
+[![Gemini API](https://img.shields.io/badge/Gemini-LLM_API-4285F4)](https://ai.google.dev/)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
 [Skills Demonstrated](#-skills-demonstrated) •
 [Preview](#-preview) •
 [Architecture](#-technical-architecture) •
-[Engineering Highlights](#-engineering-highlights) •
 [Installation](#-installation) •
 [Data Model](#-data-model)
 
@@ -190,11 +189,12 @@ zendoc-ged/
 │       ├── static/            # CSS, JS, images
 │       └── templates/         # Jinja2 templates
 ├── main_web.py                  # Entry point — run this to start the app
+├── main.py                      # Alternate/desktop entry point
 ├── requirements.txt
 ├── .env.example
 ├── Guide_Utilisateur_ZenDoc.pdf  # User guide (French)
+├── LICENSE
 └── .gitignore
-├── *.png                        # Screenshots used in this README
 ```
 
 ---
