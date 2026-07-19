@@ -194,13 +194,11 @@ zendoc-ged/
 ├── .env.example
 ├── Guide_Utilisateur_ZenDoc.pdf  # User guide (French)
 ├── LICENSE
-└── .gitignore
 ├── *.png                        # Screenshots used in this README
+└── .gitignore
+```
 
 ---
-
-
-
 
 ## 🗄 Data Model
 
