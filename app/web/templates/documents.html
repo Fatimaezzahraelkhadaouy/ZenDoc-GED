@@ -1,0 +1,447 @@
+{% extends "base.html" %}
+{% set page_active = 'documents' %}
+{% block titre %}Mes documents — ZenDoc{% endblock %}
+
+{% block contenu %}
+
+<style>
+  :root {
+    --couleur-primaire: #4338CA;
+    --couleur-primaire-fonce: #312C7D;
+    --couleur-accent: #D97706;
+    --couleur-texte: #1B1B2E;
+    --couleur-texte-secondaire: #6B7280;
+    --couleur-bordure: #E5E7EB;
+    --couleur-fond-page: #F8F9FC;
+  }
+
+  .page-documents {
+    font-family: 'Inter', -apple-system, 'Segoe UI', sans-serif;
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    box-sizing: border-box;
+    padding: 0 24px;
+  }
+
+  .page-documents *,
+  .page-documents *::before,
+  .page-documents *::after {
+    box-sizing: border-box;
+  }
+
+  /* ---- En-tête de page ---- */
+  .entete-page {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+
+  .entete-page-gauche { display: flex; align-items: center; gap: 16px; }
+
+  .icone-page {
+    flex-shrink: 0;
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #F59E0B, #D97706);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    box-shadow: 0 4px 12px rgba(217, 119, 6, 0.25);
+  }
+
+  .entete-page h3 {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--couleur-texte);
+    margin: 0 0 2px 0;
+    letter-spacing: -0.02em;
+  }
+
+  .entete-page p {
+    font-size: 14px;
+    color: var(--couleur-texte-secondaire);
+    margin: 0;
+  }
+
+  .compteur-documents {
+    font-size: 12.5px;
+    font-weight: 600;
+    color: var(--couleur-texte-secondaire);
+    background: #FFFFFF;
+    border: 1px solid var(--couleur-bordure);
+    border-radius: 999px;
+    padding: 7px 14px;
+    white-space: nowrap;
+  }
+
+  /* ---- Barre de filtre ---- */
+  .barre-filtre {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: #FFFFFF;
+    border: 1px solid var(--couleur-bordure);
+    border-radius: 12px;
+    padding: 10px 16px;
+    margin-bottom: 18px;
+  }
+
+  .barre-filtre svg {
+    flex-shrink: 0;
+    width: 17px;
+    height: 17px;
+    color: #9CA3AF;
+  }
+
+  .barre-filtre input {
+    flex: 1;
+    border: none;
+    outline: none;
+    font-size: 14px;
+    color: var(--couleur-texte);
+    background: transparent;
+    min-width: 0;
+  }
+
+  .barre-filtre input::placeholder { color: #ADADBC; }
+
+  /* ---- Carte principale ---- */
+  .carte-documents {
+    background: #FFFFFF;
+    border: 1px solid var(--couleur-bordure);
+    border-radius: 16px;
+    box-shadow: 0 1px 3px rgba(16, 24, 40, 0.06), 0 1px 2px rgba(16, 24, 40, 0.04);
+    overflow: hidden;
+  }
+
+  .table-documents {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  .table-documents thead th {
+    text-align: left;
+    font-size: 11.5px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #9999AC;
+    background: var(--couleur-fond-page);
+    padding: 14px 20px;
+    border-bottom: 1px solid var(--couleur-bordure);
+    white-space: nowrap;
+  }
+
+  .table-documents tbody tr {
+    transition: background 0.15s ease;
+  }
+
+  .table-documents tbody tr:hover {
+    background: #FBFBFE;
+  }
+
+  .table-documents tbody tr:not(:last-child) td {
+    border-bottom: 1px solid #F1F1F6;
+  }
+
+  .table-documents td {
+    padding: 16px 20px;
+    font-size: 13.5px;
+    color: var(--couleur-texte);
+    vertical-align: middle;
+  }
+
+  .cellule-nom {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-width: 0;
+  }
+
+  .icone-fichier {
+    flex-shrink: 0;
+    width: 36px;
+    height: 36px;
+    border-radius: 9px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .icone-fichier.pdf { background: #FEF2F2; color: #DC2626; }
+  .icone-fichier.docx { background: #EEF2FF; color: #4338CA; }
+  .icone-fichier.autre { background: #F3F4F6; color: #6B7280; }
+
+  .icone-fichier svg { width: 17px; height: 17px; }
+
+  .nom-fichier-texte {
+    font-weight: 600;
+    color: var(--couleur-texte);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 260px;
+  }
+
+  .badge-categorie {
+    display: inline-flex;
+    align-items: center;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 4px 11px;
+    border-radius: 999px;
+    background: #EEF2FF;
+    color: var(--couleur-primaire-fonce);
+    border: 1px solid #E0E7FF;
+    white-space: nowrap;
+  }
+
+  .badge-categorie.non-classe {
+    background: #F3F4F6;
+    color: #6B7280;
+    border-color: var(--couleur-bordure);
+  }
+
+  .taille-fichier {
+    color: var(--couleur-texte-secondaire);
+    white-space: nowrap;
+  }
+
+  .actions-documents {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: nowrap;
+  }
+
+  .btn-action {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12.5px;
+    font-weight: 600;
+    padding: 7px 12px;
+    border-radius: 8px;
+    border: 1px solid var(--couleur-bordure);
+    background: #FFFFFF;
+    color: var(--couleur-texte-secondaire);
+    text-decoration: none;
+    white-space: nowrap;
+    transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease, transform 0.1s ease;
+  }
+
+  .btn-action:hover { transform: translateY(-1px); }
+  .btn-action svg { width: 13px; height: 13px; flex-shrink: 0; }
+
+  .btn-action.voir:hover { background: var(--couleur-fond-page); border-color: #C7C7DA; color: var(--couleur-texte); }
+  .btn-action.telecharger { color: var(--couleur-primaire-fonce); border-color: #DCDBF5; }
+  .btn-action.telecharger:hover { background: #EEEDF9; border-color: #C7C3EF; }
+  .btn-action.supprimer { color: #DC2626; border-color: #FBD5D5; }
+  .btn-action.supprimer:hover { background: #FEF2F2; border-color: #F8B4B4; }
+
+  /* ---- État vide ---- */
+  .etat-vide-documents {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 56px 24px;
+  }
+
+  .etat-vide-documents .icone-vide {
+    width: 64px;
+    height: 64px;
+    border-radius: 16px;
+    background: var(--couleur-fond-page);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 18px;
+    color: #C7C7D6;
+  }
+
+  .etat-vide-documents .icone-vide svg { width: 30px; height: 30px; }
+
+  .etat-vide-documents h5 {
+    font-size: 15.5px;
+    font-weight: 700;
+    color: var(--couleur-texte);
+    margin: 0 0 6px 0;
+  }
+
+  .etat-vide-documents p {
+    font-size: 13.5px;
+    color: var(--couleur-texte-secondaire);
+    margin: 0 0 18px 0;
+    max-width: 340px;
+  }
+
+  .lien-deposer {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13.5px;
+    font-weight: 600;
+    color: #FFFFFF;
+    background: linear-gradient(135deg, var(--couleur-primaire), var(--couleur-primaire-fonce));
+    padding: 10px 18px;
+    border-radius: 10px;
+    text-decoration: none;
+    box-shadow: 0 4px 12px rgba(67, 56, 202, 0.22);
+  }
+
+  .lien-deposer svg { width: 14px; height: 14px; }
+
+  .ligne-masquee { display: none !important; }
+
+  @media (max-width: 900px) {
+    .table-documents thead { display: none; }
+    .table-documents, .table-documents tbody, .table-documents tr, .table-documents td {
+      display: block; width: 100%;
+    }
+    .table-documents tr { padding: 16px 20px; }
+    .table-documents td { padding: 4px 0; border: none !important; }
+    .cellule-nom { margin-bottom: 8px; }
+    .actions-documents { margin-top: 8px; flex-wrap: wrap; }
+  }
+</style>
+
+<div class="page-documents mb-5">
+
+    <div class="entete-page">
+        <div class="entete-page-gauche">
+            <div class="icone-page">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="22" height="22">
+                    <path d="M3 7a2 2 0 012-2h4l2 2h8a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V7z"/>
+                </svg>
+            </div>
+            <div>
+                <h3>Documents actifs</h3>
+                <p>Consultez, téléchargez ou supprimez vos documents déposés</p>
+            </div>
+        </div>
+        <span class="compteur-documents">{{ documents|length }} document{{ 's' if documents|length > 1 else '' }}</span>
+    </div>
+
+    {% if documents %}
+    <div class="barre-filtre">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3" stroke-linecap="round"/>
+        </svg>
+        <input type="text" id="champ-filtre" placeholder="Filtrer par nom ou catégorie..." oninput="filtrerDocuments()">
+    </div>
+    {% endif %}
+
+    <div class="carte-documents">
+        {% if documents %}
+        <table class="table-documents">
+            <thead>
+                <tr>
+                    <th>Nom</th>
+                    <th>Catégorie</th>
+                    <th>Taille</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody id="corps-tableau-documents">
+                {% for doc in documents %}
+                {% set extension = doc.nom_original.split('.')[-1].lower() if '.' in doc.nom_original else '' %}
+                <tr class="ligne-document" data-recherche="{{ (doc.nom_original ~ ' ' ~ (doc.categorie.nom if doc.categorie else 'non classé'))|lower }}">
+                    <td>
+                        <div class="cellule-nom">
+                            <div class="icone-fichier {{ 'pdf' if extension == 'pdf' else ('docx' if extension in ['docx', 'doc'] else 'autre') }}">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6"/>
+                                </svg>
+                            </div>
+                            <span class="nom-fichier-texte" title="{{ doc.nom_original }}">{{ doc.nom_original }}</span>
+                        </div>
+                    </td>
+                    <td>
+                        {% if doc.categorie %}
+                        <span class="badge-categorie">{{ doc.categorie.nom }}</span>
+                        {% else %}
+                        <span class="badge-categorie non-classe">Non classé</span>
+                        {% endif %}
+                    </td>
+                    <td class="taille-fichier">{{ doc.taille }} Ko</td>
+                    <td>
+                        <div class="actions-documents">
+                            <a href="{{ url_for('voir_document', document_id=doc.id) }}" target="_blank" class="btn-action voir">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/>
+                                </svg>
+                                Voir
+                            </a>
+                            <a href="{{ url_for('telecharger_document', document_id=doc.id) }}" class="btn-action telecharger">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M12 3v12M12 15l-4-4M12 15l4-4" stroke-linecap="round" stroke-linejoin="round"/><path d="M4 17v2a2 2 0 002 2h12a2 2 0 002-2v-2" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                                Télécharger
+                            </a>
+                            <a href="{{ url_for('supprimer_document_route', document_id=doc.id) }}" class="btn-action supprimer" onclick="return confirm('Supprimer « {{ doc.nom_original }} » ? Le document sera déplacé vers la corbeille.');">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M3 6h18M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2m3 0v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6h14z" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                                Supprimer
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <div id="aucun-resultat-filtre" class="etat-vide-documents ligne-masquee">
+            <div class="icone-vide">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                    <circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3" stroke-linecap="round"/>
+                </svg>
+            </div>
+            <h5>Aucun document ne correspond</h5>
+            <p>Essayez un autre terme de recherche.</p>
+        </div>
+        {% else %}
+        <div class="etat-vide-documents">
+            <div class="icone-vide">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                    <path d="M3 7a2 2 0 012-2h4l2 2h8a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V7z"/>
+                </svg>
+            </div>
+            <h5>Aucun document pour le moment</h5>
+            <p>Déposez votre premier document pour qu'il apparaisse ici, prêt à être consulté et classé automatiquement.</p>
+            <a href="{{ url_for('upload') }}" class="lien-deposer">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 16V4M12 4l-4 4M12 4l4 4" stroke-linecap="round" stroke-linejoin="round"/><path d="M4 16v3a1 1 0 001 1h14a1 1 0 001-1v-3" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                Déposer un document
+            </a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+    function filtrerDocuments() {
+        const terme = document.getElementById('champ-filtre').value.trim().toLowerCase();
+        const lignes = document.querySelectorAll('.ligne-document');
+        let visibles = 0;
+
+        lignes.forEach(function (ligne) {
+            const correspond = ligne.dataset.recherche.includes(terme);
+            ligne.classList.toggle('ligne-masquee', !correspond);
+            if (correspond) visibles++;
+        });
+
+        const messageAucunResultat = document.getElementById('aucun-resultat-filtre');
+        if (messageAucunResultat) {
+            messageAucunResultat.classList.toggle('ligne-masquee', visibles !== 0);
+        }
+    }
+</script>
+{% endblock %}

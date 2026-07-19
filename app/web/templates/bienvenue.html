@@ -1,0 +1,437 @@
+{% extends "base.html" %}
+{% set page_active = 'bienvenue' %}
+{% block titre %}Bienvenue — ZenDoc{% endblock %}
+
+{% block contenu %}
+
+<style>
+  :root {
+    --couleur-primaire: #4338CA;
+    --couleur-primaire-fonce: #312C7D;
+    --couleur-accent: #D97706;
+    --couleur-texte: #1B1B2E;
+    --couleur-texte-secondaire: #6B7280;
+    --couleur-bordure: #E5E7EB;
+    --couleur-fond-page: #F8F9FC;
+  }
+
+  .page-bienvenue {
+    font-family: 'Inter', -apple-system, 'Segoe UI', sans-serif;
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    box-sizing: border-box;
+    padding: 0 24px;
+  }
+
+  .page-bienvenue *,
+  .page-bienvenue *::before,
+  .page-bienvenue *::after { box-sizing: border-box; }
+
+  /* ---- Bannière illustrée (réduite) ---- */
+  .banniere-bienvenue {
+    position: relative;
+    overflow: hidden;
+    background: linear-gradient(120deg, #4338CA 0%, #312C7D 55%, #4C1D95 100%);
+    border-radius: 20px;
+    padding: 26px 32px;
+    margin-bottom: 24px;
+    box-shadow: 0 10px 26px rgba(49, 44, 125, 0.22);
+    min-height: 120px;
+    display: flex;
+    align-items: center;
+  }
+
+  .banniere-bienvenue::before {
+    content: '';
+    position: absolute;
+    top: -70px; right: -50px;
+    width: 220px; height: 220px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(255,255,255,0.12), transparent 70%);
+  }
+
+  .banniere-bienvenue::after {
+    content: '';
+    position: absolute;
+    bottom: -80px; right: 140px;
+    width: 160px; height: 160px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(124,58,237,0.32), transparent 70%);
+  }
+
+  .icones-flottantes { position: absolute; inset: 0; pointer-events: none; }
+
+  .icone-flottante { position: absolute; color: rgba(255, 255, 255, 0.13); }
+  .icone-flottante svg { width: 100%; height: 100%; }
+  .icone-flottante.f1 { width: 42px; height: 42px; top: 14px; right: 190px; transform: rotate(-12deg); animation: flotter 6s ease-in-out infinite; }
+  .icone-flottante.f2 { width: 32px; height: 32px; bottom: 16px; right: 280px; transform: rotate(10deg); animation: flotter 7s ease-in-out infinite 0.5s; }
+  .icone-flottante.f3 { width: 54px; height: 54px; top: 50%; right: 50px; transform: translateY(-50%) rotate(6deg); animation: flotter 8s ease-in-out infinite 1s; }
+  .icone-flottante.f4 { width: 26px; height: 26px; top: 16px; right: 40px; animation: flotter 5.5s ease-in-out infinite 0.3s; }
+
+  @keyframes flotter {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-9px); }
+  }
+
+  .banniere-contenu { position: relative; z-index: 1; max-width: 640px; }
+
+  .banniere-bienvenue h2 {
+    color: #FFFFFF;
+    font-size: 22px;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    margin: 0 0 4px 0;
+  }
+
+  .banniere-bienvenue p {
+    color: rgba(255, 255, 255, 0.78);
+    font-size: 13.5px;
+    margin: 0;
+  }
+
+  .badge-role-banniere {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: #FFFFFF;
+    background: rgba(255, 255, 255, 0.16);
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    border-radius: 999px;
+    padding: 5px 12px;
+    margin-top: 12px;
+  }
+
+  .badge-role-banniere svg { width: 10px; height: 10px; }
+
+  /* ---- Statistiques (sans anneaux décoratifs) ---- */
+  .grille-stats {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 16px;
+    margin-bottom: 30px;
+  }
+
+  .carte-stat {
+    background: #FFFFFF;
+    border: 1px solid var(--couleur-bordure);
+    border-radius: 16px;
+    padding: 20px 22px;
+    box-shadow: 0 1px 3px rgba(16, 24, 40, 0.05);
+    transition: transform 0.2s ease, box-shadow 0.25s ease;
+  }
+
+  .carte-stat:hover { transform: translateY(-3px); box-shadow: 0 12px 26px rgba(16, 24, 40, 0.1); }
+
+  .icone-stat {
+    width: 42px; height: 42px;
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    margin-bottom: 14px;
+  }
+
+  .icone-stat svg { width: 19px; height: 19px; }
+
+  .icone-stat.documents { background: #EEF2FF; color: #4338CA; }
+  .icone-stat.utilisateurs { background: #FDF2F8; color: #DB2777; }
+  .icone-stat.actions { background: #ECFDF5; color: #16A34A; }
+  .icone-stat.espace { background: #FEF3E2; color: #B45309; }
+
+  .valeur-stat {
+    font-size: 25px;
+    font-weight: 800;
+    color: var(--couleur-texte);
+    line-height: 1.1;
+    letter-spacing: -0.01em;
+  }
+
+  .label-stat {
+    font-size: 12.5px;
+    color: var(--couleur-texte-secondaire);
+    margin-top: 3px;
+    font-weight: 500;
+  }
+
+  /* ---- Raccourcis ---- */
+  .titre-groupe {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #9999AC;
+    margin: 0 0 14px 0;
+  }
+  .titre-groupe::after { content: ''; flex: 1; height: 1px; background: var(--couleur-bordure); }
+
+  .grille-raccourcis {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 16px;
+    margin-bottom: 30px;
+  }
+
+  .carte-raccourci-perso {
+    position: relative;
+    display: block;
+    background: #FFFFFF;
+    border: 1px solid var(--couleur-bordure);
+    border-radius: 18px;
+    padding: 26px 24px;
+    text-decoration: none;
+    overflow: hidden;
+    transition: transform 0.2s ease, box-shadow 0.25s ease, border-color 0.2s ease;
+  }
+
+  .carte-raccourci-perso::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; height: 4px;
+    background: var(--degrade-carte);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.3s ease;
+  }
+
+  .carte-raccourci-perso:hover::before { transform: scaleX(1); }
+
+  .carte-raccourci-perso:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 16px 32px rgba(49, 44, 125, 0.14);
+    border-color: transparent;
+  }
+
+  .carte-raccourci-perso.depot { --degrade-carte: linear-gradient(90deg, #4338CA, #6366F1); }
+  .carte-raccourci-perso.recherche { --degrade-carte: linear-gradient(90deg, #0891B2, #06B6D4); }
+  .carte-raccourci-perso.chat { --degrade-carte: linear-gradient(90deg, #7C3AED, #A78BFA); }
+
+  .raccourci-icone-perso {
+    width: 50px; height: 50px;
+    border-radius: 14px;
+    display: flex; align-items: center; justify-content: center;
+    margin-bottom: 18px;
+    transition: transform 0.25s ease;
+  }
+
+  .carte-raccourci-perso:hover .raccourci-icone-perso { transform: scale(1.08) rotate(-4deg); }
+
+  .raccourci-icone-perso svg { width: 23px; height: 23px; }
+
+  .carte-raccourci-perso.depot .raccourci-icone-perso { background: linear-gradient(135deg, #4338CA, #312C7D); color: #fff; box-shadow: 0 8px 18px rgba(67, 56, 202, 0.3); }
+  .carte-raccourci-perso.recherche .raccourci-icone-perso { background: linear-gradient(135deg, #06B6D4, #0891B2); color: #fff; box-shadow: 0 8px 18px rgba(6, 182, 212, 0.3); }
+  .carte-raccourci-perso.chat .raccourci-icone-perso { background: linear-gradient(135deg, #7C3AED, #4338CA); color: #fff; box-shadow: 0 8px 18px rgba(124, 58, 237, 0.3); }
+
+  .carte-raccourci-perso h5 {
+    font-size: 16.5px;
+    font-weight: 700;
+    color: var(--couleur-texte);
+    margin: 0 0 6px 0;
+    letter-spacing: -0.01em;
+  }
+
+  .carte-raccourci-perso p {
+    font-size: 13px;
+    color: var(--couleur-texte-secondaire);
+    margin: 0;
+    line-height: 1.55;
+  }
+
+  .fleche-raccourci {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 12.5px;
+    font-weight: 700;
+    color: var(--couleur-primaire-fonce);
+    margin-top: 16px;
+  }
+
+  .fleche-raccourci svg { width: 12px; height: 12px; transition: transform 0.2s ease; }
+  .carte-raccourci-perso:hover .fleche-raccourci svg { transform: translateX(4px); }
+
+  /* ---- Astuce ---- */
+  .carte-astuce {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    background: linear-gradient(120deg, #FFFBEB, #FEF3E2 70%);
+    border: 1px solid #FDE9C8;
+    border-radius: 18px;
+    padding: 24px 26px;
+  }
+
+  .icone-astuce {
+    flex-shrink: 0;
+    width: 46px; height: 46px;
+    border-radius: 13px;
+    background: #FFFFFF;
+    border: 1px solid #FDE9C8;
+    display: flex; align-items: center; justify-content: center;
+    color: #B45309;
+    box-shadow: 0 4px 12px rgba(217, 119, 6, 0.15);
+  }
+
+  .icone-astuce svg { width: 21px; height: 21px; }
+
+  .carte-astuce h5 {
+    font-size: 15px;
+    font-weight: 700;
+    color: #92400E;
+    margin: 0 0 4px 0;
+  }
+
+  .carte-astuce p {
+    font-size: 13.5px;
+    color: #B45309;
+    margin: 0;
+    line-height: 1.5;
+  }
+
+  @media (max-width: 900px) {
+    .grille-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .grille-raccourcis { grid-template-columns: minmax(0, 1fr); }
+    .banniere-bienvenue { padding: 22px; min-height: auto; }
+    .icones-flottantes { display: none; }
+    .carte-astuce { flex-direction: column; text-align: center; }
+  }
+</style>
+
+<div class="page-bienvenue mb-5">
+
+    <div class="banniere-bienvenue">
+        <div class="icones-flottantes">
+            <div class="icone-flottante f1">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6"/></svg>
+            </div>
+            <div class="icone-flottante f2">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+            </div>
+            <div class="icone-flottante f3">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 11.5a8.5 8.5 0 01-8.5 8.5c-1.4 0-2.7-.3-3.9-.9L3 21l1.9-5.6A8.5 8.5 0 1121 11.5z"/></svg>
+            </div>
+            <div class="icone-flottante f4">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M13 2L4 14h7l-1 8 9-12h-7l1-8z"/></svg>
+            </div>
+        </div>
+        <div class="banniere-contenu">
+            <h2>👋 {{ salutation }} {{ nom.split(' ')[0] }} !</h2>
+            <p>Que souhaitez-vous faire aujourd'hui ?</p>
+            <span class="badge-role-banniere">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-7 8-7s8 3 8 7"/>
+                </svg>
+                {{ role }}
+            </span>
+        </div>
+    </div>
+
+    <div class="grille-stats">
+        <div class="carte-stat">
+            <div class="icone-stat documents">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6"/>
+                </svg>
+            </div>
+            <div class="valeur-stat">{{ stats.total_documents }}</div>
+            <div class="label-stat">Documents</div>
+        </div>
+        <div class="carte-stat">
+            <div class="icone-stat utilisateurs">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-7 8-7s8 3 8 7"/>
+                </svg>
+            </div>
+            <div class="valeur-stat">{{ stats.total_utilisateurs }}</div>
+            <div class="label-stat">Utilisateurs</div>
+        </div>
+        <div class="carte-stat">
+            <div class="icone-stat actions">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M3 17l6-6 4 4 8-8" stroke-linecap="round" stroke-linejoin="round"/><path d="M17 7h4v4" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </div>
+            <div class="valeur-stat">{{ stats.total_actions }}</div>
+            <div class="label-stat">Actions</div>
+        </div>
+        <div class="carte-stat">
+            <div class="icone-stat espace">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v14c0 1.7 3.6 3 8 3s8-1.3 8-3V5"/><path d="M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3"/>
+                </svg>
+            </div>
+            <div class="valeur-stat">{{ stats.taille_totale_mo }} Mo</div>
+            <div class="label-stat">Espace</div>
+        </div>
+    </div>
+
+    <div class="titre-groupe">Actions rapides</div>
+    <div class="grille-raccourcis">
+        <a href="{{ url_for('upload') }}" class="carte-raccourci-perso depot">
+            <div class="raccourci-icone-perso">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                    <path d="M12 16V4M12 4l-4 4M12 4l4 4" stroke-linecap="round" stroke-linejoin="round"/><path d="M4 16v3a1 1 0 001 1h14a1 1 0 001-1v-3" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </div>
+            <h5>Déposer un document</h5>
+            <p>Ajoutez un PDF ou Word, l'IA l'analyse automatiquement</p>
+            <span class="fleche-raccourci">
+                Déposer
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <path d="M5 12h14M13 6l6 6-6 6" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </span>
+        </a>
+
+        <a href="{{ url_for('recherche') }}" class="carte-raccourci-perso recherche">
+            <div class="raccourci-icone-perso">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                    <circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3" stroke-linecap="round"/>
+                </svg>
+            </div>
+            <h5>Rechercher</h5>
+            <p>Trouvez un document par le sens, pas juste par mot-clé</p>
+            <span class="fleche-raccourci">
+                Rechercher
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <path d="M5 12h14M13 6l6 6-6 6" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </span>
+        </a>
+
+        <a href="{{ url_for('chat') }}" class="carte-raccourci-perso chat">
+            <div class="raccourci-icone-perso">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                    <path d="M21 11.5a8.5 8.5 0 01-8.5 8.5c-1.4 0-2.7-.3-3.9-.9L3 21l1.9-5.6A8.5 8.5 0 1121 11.5z"/>
+                </svg>
+            </div>
+            <h5>Discuter avec vos documents</h5>
+            <p>Posez une question, obtenez une réponse instantanée</p>
+            <span class="fleche-raccourci">
+                Discuter
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <path d="M5 12h14M13 6l6 6-6 6" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </span>
+        </a>
+    </div>
+
+    <div class="carte-astuce">
+        <div class="icone-astuce">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M9 18h6M10 22h4M12 2a6 6 0 00-4 10.5c.6.6 1 1.5 1 2.5h6c0-1 .4-1.9 1-2.5A6 6 0 0012 2z"/>
+            </svg>
+        </div>
+        <div>
+            <h5>Astuce</h5>
+            <p>La recherche sémantique comprend le sens de vos questions — inutile de retrouver les mots-clés exacts d'un document, décrivez simplement ce que vous cherchez.</p>
+        </div>
+    </div>
+
+</div>
+{% endblock %}

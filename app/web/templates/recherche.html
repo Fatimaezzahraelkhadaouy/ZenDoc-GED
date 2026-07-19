@@ -1,0 +1,536 @@
+{% extends "base.html" %}
+{% set page_active = 'recherche' %}
+{% block titre %}Recherche — ZenDoc{% endblock %}
+
+{% block contenu %}
+
+<style>
+  :root {
+    --couleur-primaire: #4338CA;
+    --couleur-primaire-fonce: #312C7D;
+    --couleur-accent: #D97706;
+    --couleur-texte: #1B1B2E;
+    --couleur-texte-secondaire: #6B7280;
+    --couleur-bordure: #E5E7EB;
+    --couleur-fond-page: #F8F9FC;
+  }
+
+  .page-recherche {
+    font-family: 'Inter', -apple-system, 'Segoe UI', sans-serif;
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    box-sizing: border-box;
+    padding: 0 24px;
+  }
+
+  .page-recherche *,
+  .page-recherche *::before,
+  .page-recherche *::after {
+    box-sizing: border-box;
+  }
+
+  /* ---- En-tête de page ---- */
+  .entete-page {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 28px;
+  }
+
+  .icone-page {
+    flex-shrink: 0;
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #06B6D4, #0891B2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    box-shadow: 0 4px 12px rgba(8, 145, 178, 0.25);
+  }
+
+  .entete-page h3 {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--couleur-texte);
+    margin: 0 0 2px 0;
+    letter-spacing: -0.02em;
+  }
+
+  .entete-page p {
+    font-size: 14px;
+    color: var(--couleur-texte-secondaire);
+    margin: 0;
+  }
+
+  /* ---- Carte de recherche ---- */
+  .carte-recherche {
+    background: #FFFFFF;
+    border: 1px solid var(--couleur-bordure);
+    border-radius: 16px;
+    padding: 28px;
+    width: 100%;
+    box-shadow: 0 1px 3px rgba(16, 24, 40, 0.06), 0 1px 2px rgba(16, 24, 40, 0.04);
+    margin-bottom: 24px;
+  }
+
+  .barre-recherche {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--couleur-fond-page);
+    border: 2px solid var(--couleur-bordure);
+    border-radius: 14px;
+    padding: 6px 6px 6px 18px;
+    transition: border-color 0.2s ease, background 0.2s ease;
+  }
+
+  .barre-recherche:focus-within {
+    border-color: var(--couleur-primaire);
+    background: #FFFFFF;
+  }
+
+  .barre-recherche svg {
+    flex-shrink: 0;
+    width: 20px;
+    height: 20px;
+    color: #9CA3AF;
+  }
+
+  .barre-recherche input {
+    flex: 1;
+    border: none;
+    background: transparent;
+    outline: none;
+    font-size: 15.5px;
+    color: var(--couleur-texte);
+    padding: 12px 4px;
+    min-width: 0;
+  }
+
+  .barre-recherche input::placeholder { color: #ADADBC; }
+
+  .btn-rechercher {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: linear-gradient(135deg, var(--couleur-primaire), var(--couleur-primaire-fonce));
+    color: #FFFFFF;
+    font-size: 14.5px;
+    font-weight: 600;
+    border: none;
+    border-radius: 10px;
+    padding: 12px 20px;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: box-shadow 0.2s ease, transform 0.15s ease;
+    box-shadow: 0 4px 12px rgba(67, 56, 202, 0.22);
+  }
+  .btn-rechercher:hover { box-shadow: 0 6px 16px rgba(67, 56, 202, 0.3); }
+  .btn-rechercher:active { transform: scale(0.98); }
+  .btn-rechercher svg { width: 15px; height: 15px; flex-shrink: 0; }
+
+  .suggestions-recherche {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 16px;
+  }
+
+  .suggestions-recherche span.libelle {
+    font-size: 12.5px;
+    color: #9CA3AF;
+    margin-right: 4px;
+  }
+
+  .puce-suggestion {
+    font-size: 12.5px;
+    font-weight: 500;
+    color: var(--couleur-texte-secondaire);
+    background: var(--couleur-fond-page);
+    border: 1px solid var(--couleur-bordure);
+    border-radius: 999px;
+    padding: 6px 13px;
+    cursor: pointer;
+    transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+  }
+
+  .puce-suggestion:hover {
+    background: #EEEDF9;
+    border-color: #C7C3EF;
+    color: var(--couleur-primaire-fonce);
+  }
+
+  /* ---- Zone résultats ---- */
+  .entete-resultats {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+
+  .entete-resultats h5 {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--couleur-texte);
+    margin: 0;
+  }
+
+  .entete-resultats h5 .requete-terme {
+    color: var(--couleur-primaire-fonce);
+    font-style: normal;
+    font-weight: 700;
+  }
+
+  .compteur-resultats {
+    font-size: 12.5px;
+    color: var(--couleur-texte-secondaire);
+    background: var(--couleur-fond-page);
+    border: 1px solid var(--couleur-bordure);
+    border-radius: 999px;
+    padding: 4px 12px;
+  }
+
+  .liste-resultats {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .carte-resultat {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    background: #FFFFFF;
+    border: 1px solid var(--couleur-bordure);
+    border-radius: 14px;
+    padding: 18px 20px;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
+  }
+
+  .carte-resultat:hover {
+    border-color: #C7C3EF;
+    box-shadow: 0 4px 16px rgba(67, 56, 202, 0.08);
+    transform: translateY(-1px);
+  }
+
+  .icone-resultat {
+    flex-shrink: 0;
+    width: 42px;
+    height: 42px;
+    border-radius: 11px;
+    background: #EEF2FF;
+    border: 1px solid #E0E7FF;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--couleur-primaire-fonce);
+  }
+
+  .icone-resultat svg { width: 20px; height: 20px; }
+
+  .corps-resultat { min-width: 0; flex: 1; }
+
+  .titre-resultat {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 4px;
+  }
+
+  .titre-resultat .nom-document {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--couleur-texte);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .badge-pertinence {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    font-weight: 700;
+    padding: 4px 11px;
+    border-radius: 999px;
+    background: #ECFDF3;
+    color: #15803D;
+    border: 1px solid #C8EED2;
+    white-space: nowrap;
+  }
+
+  .badge-pertinence.moyen {
+    background: #FEF3E2;
+    color: #B45309;
+    border-color: #FBE0B0;
+  }
+
+  .badge-pertinence.faible {
+    background: #F3F4F6;
+    color: #6B7280;
+    border-color: var(--couleur-bordure);
+  }
+
+  .barre-pertinence {
+    width: 100%;
+    height: 4px;
+    background: #EDEDF5;
+    border-radius: 999px;
+    overflow: hidden;
+    margin-bottom: 10px;
+  }
+
+  .barre-pertinence-remplissage {
+    height: 100%;
+    border-radius: 999px;
+    background: linear-gradient(90deg, #34D399, #16A34A);
+  }
+
+  .barre-pertinence-remplissage.moyen { background: linear-gradient(90deg, #FBBF24, #D97706); }
+  .barre-pertinence-remplissage.faible { background: linear-gradient(90deg, #C7C7D6, #9CA3AF); }
+
+  .extrait-resultat {
+    font-size: 13px;
+    color: var(--couleur-texte-secondaire);
+    line-height: 1.55;
+    margin-bottom: 10px;
+  }
+
+  .meta-resultat {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    font-size: 12px;
+    color: #9CA3AF;
+  }
+
+  .meta-resultat span {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+
+  .meta-resultat svg { width: 13px; height: 13px; }
+
+  /* ---- État vide (avant recherche) ---- */
+  .etat-vide {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 56px 24px;
+    background: #FFFFFF;
+    border: 1px solid var(--couleur-bordure);
+    border-radius: 16px;
+  }
+
+  .etat-vide .icone-vide {
+    width: 64px;
+    height: 64px;
+    border-radius: 16px;
+    background: var(--couleur-fond-page);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 18px;
+    color: #C7C7D6;
+  }
+
+  .etat-vide .icone-vide svg { width: 30px; height: 30px; }
+
+  .etat-vide h5 {
+    font-size: 15.5px;
+    font-weight: 700;
+    color: var(--couleur-texte);
+    margin: 0 0 6px 0;
+  }
+
+  .etat-vide p {
+    font-size: 13.5px;
+    color: var(--couleur-texte-secondaire);
+    margin: 0;
+    max-width: 380px;
+  }
+
+  /* ---- Aucun résultat ---- */
+  .aucun-resultat {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 44px 24px;
+    background: #FFFBEB;
+    border: 1px solid #FDE9C8;
+    border-radius: 16px;
+  }
+
+  .aucun-resultat .icone-vide {
+    width: 56px;
+    height: 56px;
+    border-radius: 14px;
+    background: #FEF3E2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 16px;
+    color: #B45309;
+  }
+
+  .aucun-resultat .icone-vide svg { width: 26px; height: 26px; }
+
+  .aucun-resultat h5 {
+    font-size: 15px;
+    font-weight: 700;
+    color: #92400E;
+    margin: 0 0 6px 0;
+  }
+
+  .aucun-resultat p {
+    font-size: 13.5px;
+    color: #B45309;
+    margin: 0;
+    max-width: 380px;
+  }
+
+  @media (max-width: 640px) {
+    .barre-recherche { flex-wrap: wrap; }
+    .btn-rechercher { width: 100%; justify-content: center; }
+    .titre-resultat { flex-direction: column; align-items: flex-start; }
+  }
+</style>
+
+<div class="page-recherche mb-5">
+
+    <div class="entete-page">
+        <div class="icone-page">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="22" height="22">
+                <circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3" stroke-linecap="round"/>
+            </svg>
+        </div>
+        <div>
+            <h3>Recherche sémantique</h3>
+            <p>Recherchez par sens, pas seulement par mots-clés exacts</p>
+        </div>
+    </div>
+
+    <div class="carte-recherche">
+        <form method="POST" id="formulaire-recherche" data-chargement>
+            <div class="barre-recherche">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3" stroke-linecap="round"/>
+                </svg>
+                <input type="text" name="requete" id="champ-requete" placeholder="Ex : principes d'économie, contrats de travail..." value="{{ requete }}" required autocomplete="off">
+                <button type="submit" class="btn-rechercher">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3" stroke-linecap="round"/>
+                    </svg>
+                    Rechercher
+                </button>
+            </div>
+
+            {% if not resultats %}
+            <div class="suggestions-recherche">
+                <span class="libelle">Suggestions :</span>
+                <span class="puce-suggestion" onclick="remplirRecherche('contrats de travail')">Contrats de travail</span>
+                <span class="puce-suggestion" onclick="remplirRecherche('rapports financiers')">Rapports financiers</span>
+                <span class="puce-suggestion" onclick="remplirRecherche('procédures internes')">Procédures internes</span>
+                <span class="puce-suggestion" onclick="remplirRecherche('comptes rendus de réunion')">Comptes rendus de réunion</span>
+            </div>
+            {% endif %}
+        </form>
+    </div>
+
+    {% if resultats %}
+        <div class="entete-resultats">
+            <h5>Résultats pour : <span class="requete-terme">{{ requete }}</span></h5>
+            <span class="compteur-resultats">{{ resultats|length }} document{{ 's' if resultats|length > 1 else '' }} trouvé{{ 's' if resultats|length > 1 else '' }}</span>
+        </div>
+
+        <div class="liste-resultats">
+            {% for resultat in resultats %}
+            {% set niveau = 'eleve' if resultat.pertinence >= 75 else ('moyen' if resultat.pertinence >= 45 else 'faible') %}
+            <div class="carte-resultat">
+                <div class="icone-resultat">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6"/>
+                    </svg>
+                </div>
+                <div class="corps-resultat">
+                    <div class="titre-resultat">
+                        <span class="nom-document">{{ resultat.nom }}</span>
+                        <span class="badge-pertinence {{ '' if niveau == 'eleve' else niveau }}">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="11" height="11">
+                                <path d="M13 2L4 14h7l-1 8 9-12h-7l1-8z"/>
+                            </svg>
+                            {{ resultat.pertinence }}% pertinent
+                        </span>
+                    </div>
+                    <div class="barre-pertinence">
+                        <div class="barre-pertinence-remplissage {{ '' if niveau == 'eleve' else niveau }}" style="width: {{ resultat.pertinence }}%;"></div>
+                    </div>
+                    {% if resultat.extrait %}
+                    <div class="extrait-resultat">{{ resultat.extrait }}</div>
+                    {% endif %}
+                    <div class="meta-resultat">
+                        {% if resultat.categorie %}
+                        <span>
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M3 7a2 2 0 012-2h4l2 2h8a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V7z"/>
+                            </svg>
+                            {{ resultat.categorie }}
+                        </span>
+                        {% endif %}
+                        {% if resultat.date %}
+                        <span>
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/>
+                            </svg>
+                            {{ resultat.date }}
+                        </span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    {% elif requete %}
+        <div class="aucun-resultat">
+            <div class="icone-vide">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                    <circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3" stroke-linecap="round"/><path d="M8 8l6 6M14 8l-6 6" stroke-linecap="round"/>
+                </svg>
+            </div>
+            <h5>Aucun résultat pour « {{ requete }} »</h5>
+            <p>Essayez une formulation différente ou des termes plus généraux — la recherche sémantique fonctionne mieux avec des phrases complètes.</p>
+        </div>
+    {% else %}
+        <div class="etat-vide">
+            <div class="icone-vide">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                    <circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3" stroke-linecap="round"/>
+                </svg>
+            </div>
+            <h5>Commencez votre recherche</h5>
+            <p>Décrivez ce que vous cherchez en langage naturel — l'IA comprend le sens de votre requête, pas seulement les mots-clés exacts.</p>
+        </div>
+    {% endif %}
+</div>
+
+<script>
+    function remplirRecherche(texte) {
+        const champ = document.getElementById('champ-requete');
+        champ.value = texte;
+        champ.focus();
+    }
+</script>
+{% endblock %}

@@ -1,0 +1,447 @@
+{% extends "base.html" %}
+{% set page_active = 'corbeille' %}
+{% block titre %}Corbeille — ZenDoc{% endblock %}
+
+{% block contenu %}
+
+<style>
+  :root {
+    --couleur-primaire: #4338CA;
+    --couleur-primaire-fonce: #312C7D;
+    --couleur-texte: #1B1B2E;
+    --couleur-texte-secondaire: #6B7280;
+    --couleur-bordure: #E5E7EB;
+    --couleur-fond-page: #F8F9FC;
+  }
+
+  .page-corbeille {
+    font-family: 'Inter', -apple-system, 'Segoe UI', sans-serif;
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    box-sizing: border-box;
+    padding: 0 24px;
+  }
+
+  .page-corbeille *,
+  .page-corbeille *::before,
+  .page-corbeille *::after {
+    box-sizing: border-box;
+  }
+
+  /* ---- En-tête de page ---- */
+  .entete-page {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-bottom: 18px;
+  }
+
+  .entete-page-gauche { display: flex; align-items: center; gap: 16px; }
+
+  .icone-page {
+    flex-shrink: 0;
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #9CA3AF, #6B7280);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    box-shadow: 0 4px 12px rgba(107, 114, 128, 0.25);
+  }
+
+  .entete-page h3 {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--couleur-texte);
+    margin: 0 0 2px 0;
+    letter-spacing: -0.02em;
+  }
+
+  .entete-page p {
+    font-size: 14px;
+    color: var(--couleur-texte-secondaire);
+    margin: 0;
+  }
+
+  .compteur-documents {
+    font-size: 12.5px;
+    font-weight: 600;
+    color: var(--couleur-texte-secondaire);
+    background: #FFFFFF;
+    border: 1px solid var(--couleur-bordure);
+    border-radius: 999px;
+    padding: 7px 14px;
+    white-space: nowrap;
+  }
+
+  /* ---- Bandeau d'information ---- */
+  .bandeau-info {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    background: #FFFBEB;
+    border: 1px solid #FDE9C8;
+    border-radius: 12px;
+    padding: 14px 16px;
+    margin-bottom: 18px;
+  }
+
+  .bandeau-info svg {
+    flex-shrink: 0;
+    width: 18px;
+    height: 18px;
+    color: #B45309;
+    margin-top: 1px;
+  }
+
+  .bandeau-info p {
+    font-size: 13px;
+    color: #92400E;
+    margin: 0;
+    line-height: 1.5;
+  }
+
+  /* ---- Barre de filtre ---- */
+  .barre-filtre {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: #FFFFFF;
+    border: 1px solid var(--couleur-bordure);
+    border-radius: 12px;
+    padding: 10px 16px;
+    margin-bottom: 18px;
+  }
+
+  .barre-filtre svg {
+    flex-shrink: 0;
+    width: 17px;
+    height: 17px;
+    color: #9CA3AF;
+  }
+
+  .barre-filtre input {
+    flex: 1;
+    border: none;
+    outline: none;
+    font-size: 14px;
+    color: var(--couleur-texte);
+    background: transparent;
+    min-width: 0;
+  }
+
+  .barre-filtre input::placeholder { color: #ADADBC; }
+
+  /* ---- Carte principale ---- */
+  .carte-documents {
+    background: #FFFFFF;
+    border: 1px solid var(--couleur-bordure);
+    border-radius: 16px;
+    box-shadow: 0 1px 3px rgba(16, 24, 40, 0.06), 0 1px 2px rgba(16, 24, 40, 0.04);
+    overflow: hidden;
+  }
+
+  .table-documents {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  .table-documents thead th {
+    text-align: left;
+    font-size: 11.5px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #9999AC;
+    background: var(--couleur-fond-page);
+    padding: 14px 20px;
+    border-bottom: 1px solid var(--couleur-bordure);
+    white-space: nowrap;
+  }
+
+  .table-documents tbody tr {
+    transition: background 0.15s ease;
+  }
+
+  .table-documents tbody tr:hover {
+    background: #FBFBFE;
+  }
+
+  .table-documents tbody tr:not(:last-child) td {
+    border-bottom: 1px solid #F1F1F6;
+  }
+
+  .table-documents td {
+    padding: 16px 20px;
+    font-size: 13.5px;
+    color: var(--couleur-texte);
+    vertical-align: middle;
+  }
+
+  .cellule-nom {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-width: 0;
+  }
+
+  .icone-fichier {
+    flex-shrink: 0;
+    width: 36px;
+    height: 36px;
+    border-radius: 9px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #F3F4F6;
+    color: #9CA3AF;
+    opacity: 0.85;
+  }
+
+  .icone-fichier svg { width: 17px; height: 17px; }
+
+  .nom-fichier-texte {
+    font-weight: 600;
+    color: var(--couleur-texte-secondaire);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 260px;
+  }
+
+  .badge-categorie {
+    display: inline-flex;
+    align-items: center;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 4px 11px;
+    border-radius: 999px;
+    background: #F3F4F6;
+    color: #6B7280;
+    border: 1px solid var(--couleur-bordure);
+    white-space: nowrap;
+  }
+
+  .taille-fichier {
+    color: var(--couleur-texte-secondaire);
+    white-space: nowrap;
+  }
+
+  .cellule-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .btn-action {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12.5px;
+    font-weight: 600;
+    padding: 7px 12px;
+    border-radius: 8px;
+    border: 1px solid #C8EED2;
+    background: #FFFFFF;
+    color: #16A34A;
+    text-decoration: none;
+    white-space: nowrap;
+    transition: background 0.15s ease, border-color 0.15s ease, transform 0.1s ease;
+    cursor: pointer;
+  }
+
+  .btn-action:hover { background: #ECFDF3; border-color: #9BE0AF; transform: translateY(-1px); }
+  .btn-action svg { width: 13px; height: 13px; flex-shrink: 0; }
+
+  .btn-action-danger {
+    border-color: #F9C9C9;
+    color: #DC2626;
+  }
+
+  .btn-action-danger:hover {
+    background: #FEF2F2;
+    border-color: #F5A3A3;
+  }
+
+  /* ---- État vide ---- */
+  .etat-vide-documents {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 56px 24px;
+  }
+
+  .etat-vide-documents .icone-vide {
+    width: 64px;
+    height: 64px;
+    border-radius: 16px;
+    background: var(--couleur-fond-page);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 18px;
+    color: #C7C7D6;
+  }
+
+  .etat-vide-documents .icone-vide svg { width: 30px; height: 30px; }
+
+  .etat-vide-documents h5 {
+    font-size: 15.5px;
+    font-weight: 700;
+    color: var(--couleur-texte);
+    margin: 0 0 6px 0;
+  }
+
+  .etat-vide-documents p {
+    font-size: 13.5px;
+    color: var(--couleur-texte-secondaire);
+    margin: 0;
+    max-width: 340px;
+  }
+
+  .ligne-masquee { display: none !important; }
+
+  @media (max-width: 900px) {
+    .table-documents thead { display: none; }
+    .table-documents, .table-documents tbody, .table-documents tr, .table-documents td {
+      display: block; width: 100%;
+    }
+    .table-documents tr { padding: 16px 20px; }
+    .table-documents td { padding: 4px 0; border: none !important; }
+    .cellule-nom { margin-bottom: 8px; }
+  }
+</style>
+
+<div class="page-corbeille mb-5">
+
+    <div class="entete-page">
+        <div class="entete-page-gauche">
+            <div class="icone-page">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="22" height="22">
+                    <path d="M3 6h18M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2m3 0v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6h14z" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </div>
+            <div>
+                <h3>Documents supprimés</h3>
+                <p>Restaurez un document avant qu'il ne soit définitivement effacé</p>
+            </div>
+        </div>
+        <span class="compteur-documents">{{ documents|length }} document{{ 's' if documents|length > 1 else '' }}</span>
+    </div>
+
+    {% if documents %}
+    <div class="bandeau-info">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16h.01" stroke-linecap="round"/>
+        </svg>
+        <p>Les documents placés dans la corbeille restent visibles ici et peuvent être restaurés à tout moment.</p>
+    </div>
+
+    <div class="barre-filtre">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3" stroke-linecap="round"/>
+        </svg>
+        <input type="text" id="champ-filtre" placeholder="Filtrer par nom ou catégorie..." oninput="filtrerDocuments()">
+    </div>
+    {% endif %}
+
+    <div class="carte-documents">
+        {% if documents %}
+        <table class="table-documents">
+            <thead>
+                <tr>
+                    <th>Nom</th>
+                    <th>Catégorie</th>
+                    <th>Taille</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for doc in documents %}
+                <tr class="ligne-document" data-recherche="{{ (doc.nom_original ~ ' ' ~ (doc.categorie.nom if doc.categorie else 'non classé'))|lower }}">
+                    <td>
+                        <div class="cellule-nom">
+                            <div class="icone-fichier">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6"/>
+                                </svg>
+                            </div>
+                            <span class="nom-fichier-texte" title="{{ doc.nom_original }}">{{ doc.nom_original }}</span>
+                        </div>
+                    </td>
+                    <td>
+                        <span class="badge-categorie">{{ doc.categorie.nom if doc.categorie else "Non classé" }}</span>
+                    </td>
+                    <td class="taille-fichier">{{ doc.taille }} Ko</td>
+                    <td>
+                        <div class="cellule-actions">
+                            <a href="{{ url_for('restaurer_document_route', document_id=doc.id) }}" class="btn-action">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M3 12a9 9 0 109-9 9.75 9.75 0 00-6.7 2.7L3 8" stroke-linecap="round" stroke-linejoin="round"/><path d="M3 3v5h5" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                                Restaurer
+                            </a>
+                            <a href="{{ url_for('supprimer_definitivement_route', document_id=doc.id) }}"
+                               class="btn-action btn-action-danger"
+                               onclick="return confirm('Supprimer définitivement « {{ doc.nom_original }} » ? Cette action est irréversible.');">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M3 6h18M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2m3 0v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6h14z" stroke-linecap="round" stroke-linejoin="round"/>
+                                    <path d="M10 11v6M14 11v6" stroke-linecap="round"/>
+                                </svg>
+                                Supprimer définitivement
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <div id="aucun-resultat-filtre" class="etat-vide-documents ligne-masquee">
+            <div class="icone-vide">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                    <circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3" stroke-linecap="round"/>
+                </svg>
+            </div>
+            <h5>Aucun document ne correspond</h5>
+            <p>Essayez un autre terme de recherche.</p>
+        </div>
+        {% else %}
+        <div class="etat-vide-documents">
+            <div class="icone-vide">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                    <path d="M3 6h18M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2m3 0v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6h14z" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </div>
+            <h5>Corbeille vide</h5>
+            <p>Les documents que vous supprimez apparaîtront ici, prêts à être restaurés si besoin.</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+    function filtrerDocuments() {
+        const terme = document.getElementById('champ-filtre').value.trim().toLowerCase();
+        const lignes = document.querySelectorAll('.ligne-document');
+        let visibles = 0;
+
+        lignes.forEach(function (ligne) {
+            const correspond = ligne.dataset.recherche.includes(terme);
+            ligne.classList.toggle('ligne-masquee', !correspond);
+            if (correspond) visibles++;
+        });
+
+        const messageAucunResultat = document.getElementById('aucun-resultat-filtre');
+        if (messageAucunResultat) {
+            messageAucunResultat.classList.toggle('ligne-masquee', visibles !== 0);
+        }
+    }
+</script>
+{% endblock %}

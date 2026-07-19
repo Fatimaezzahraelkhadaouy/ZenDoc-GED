@@ -1,0 +1,519 @@
+{% extends "base.html" %}
+{% set page_active = 'upload' %}
+{% block titre %}Dépôt de documents — ZenDoc{% endblock %}
+
+{% block contenu %}
+
+<style>
+  :root {
+    --couleur-primaire: #4338CA;
+    --couleur-primaire-fonce: #312C7D;
+    --couleur-accent: #D97706;
+    --couleur-texte: #1B1B2E;
+    --couleur-texte-secondaire: #6B7280;
+    --couleur-bordure: #E5E7EB;
+    --couleur-fond-page: #F8F9FC;
+  }
+
+  .page-depot {
+    font-family: 'Inter', -apple-system, 'Segoe UI', sans-serif;
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    box-sizing: border-box;
+    padding: 0 24px;
+  }
+
+  .page-depot *,
+  .page-depot *::before,
+  .page-depot *::after {
+    box-sizing: border-box;
+  }
+
+  /* ---- En-tête de page ---- */
+  .entete-page {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 28px;
+  }
+
+  .icone-page {
+    flex-shrink: 0;
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, var(--couleur-primaire), var(--couleur-primaire-fonce));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    box-shadow: 0 4px 12px rgba(67, 56, 202, 0.25);
+  }
+
+  .entete-page h3 {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--couleur-texte);
+    margin: 0 0 2px 0;
+    letter-spacing: -0.02em;
+  }
+
+  .entete-page p {
+    font-size: 14px;
+    color: var(--couleur-texte-secondaire);
+    margin: 0;
+  }
+
+  /* ---- Carte principale ---- */
+  .carte-depot {
+    background: #FFFFFF;
+    border: 1px solid var(--couleur-bordure);
+    border-radius: 16px;
+    padding: 32px;
+    width: 100%;
+    box-shadow: 0 1px 3px rgba(16, 24, 40, 0.06), 0 1px 2px rgba(16, 24, 40, 0.04);
+  }
+
+  /* ---- Layout 2 colonnes ---- */
+  .grille-principale {
+    display: grid;
+    grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+    gap: 32px;
+    align-items: stretch;
+    width: 100%;
+  }
+
+  .colonne-depot {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+  }
+
+  /* ---- Zone de dépôt ---- */
+  label.zone-depot#zone-depot {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    flex: 1;
+    min-height: 260px;
+    width: 100%;
+    padding: 36px 24px;
+    cursor: pointer;
+    background: var(--couleur-fond-page);
+    border: 2px dashed #D1D5DB;
+    border-radius: 14px;
+    transition: border-color 0.2s ease, background 0.2s ease;
+  }
+
+  .zone-depot:hover {
+    border-color: var(--couleur-primaire);
+    background: #F5F5FC;
+  }
+
+  .zone-depot.survol {
+    border-color: var(--couleur-accent);
+    background: #FFF9F0;
+  }
+
+  .icone-upload-conteneur {
+    width: 56px;
+    height: 56px;
+    border-radius: 14px;
+    background: #EEEDF9;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 18px;
+    flex-shrink: 0;
+  }
+
+  .icone-upload-svg { width: 26px; height: 26px; color: var(--couleur-primaire-fonce); }
+
+  .texte-principal { font-size: 16px; font-weight: 600; color: var(--couleur-texte); margin-bottom: 4px; }
+  .texte-secondaire { font-size: 13px; color: #9CA3AF; margin-bottom: 16px; }
+
+  .badges-format { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; }
+  .badge-format {
+    font-size: 11px; font-weight: 700; letter-spacing: 0.03em;
+    padding: 5px 12px; border-radius: 8px;
+    background: #FFFFFF; border: 1px solid var(--couleur-bordure); color: var(--couleur-texte-secondaire);
+    white-space: nowrap;
+  }
+
+  #input-fichier { display: none; }
+
+  .nom-fichier-choisi {
+    display: none; margin-top: 14px; font-size: 13px; font-weight: 600;
+    color: var(--couleur-accent); background: #FEF3E2; padding: 7px 14px; border-radius: 8px;
+    align-items: center; gap: 8px; width: fit-content; max-width: 100%;
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+
+  .barre-progression {
+    display: none;
+    width: 100%;
+    height: 6px;
+    background: #EDEDF5;
+    border-radius: 999px;
+    margin-top: 14px;
+    overflow: hidden;
+  }
+
+  .barre-progression-remplissage {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, var(--couleur-primaire), var(--couleur-accent));
+    border-radius: 999px;
+    transition: width 0.3s ease;
+  }
+
+  .btn-analyser {
+    width: 100%; display: flex; align-items: center; justify-content: center; gap: 10px;
+    margin-top: 20px; padding: 15px;
+    background: linear-gradient(135deg, var(--couleur-primaire), var(--couleur-primaire-fonce));
+    color: #FFFFFF; font-size: 15px; font-weight: 600; border: none; border-radius: 12px;
+    cursor: pointer; transition: transform 0.15s ease, box-shadow 0.2s ease, opacity 0.2s ease;
+    box-shadow: 0 4px 14px rgba(67, 56, 202, 0.25);
+  }
+  .btn-analyser:hover { box-shadow: 0 6px 20px rgba(67, 56, 202, 0.32); transform: translateY(-1px); }
+  .btn-analyser:active { transform: scale(0.99); }
+  .btn-analyser:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+  .btn-analyser svg { width: 17px; height: 17px; color: #FBBF24; flex-shrink: 0; }
+
+  .note-confidentialite {
+    display: flex; align-items: center; justify-content: center; gap: 6px;
+    text-align: center; font-size: 12px; color: #9CA3AF; margin-top: 14px;
+  }
+  .note-confidentialite svg { width: 13px; height: 13px; flex-shrink: 0; }
+
+  /* ---- Panneau droit : pipeline ---- */
+  .panneau-pipeline {
+    background: var(--couleur-fond-page);
+    border: 1px solid #EFEFF5;
+    border-radius: 14px;
+    padding: 26px 24px;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+  }
+
+  .panneau-pipeline h4 {
+    font-size: 12.5px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #9999AC;
+    margin: 0 0 20px 0;
+  }
+
+  .etape-verticale {
+    display: flex;
+    gap: 14px;
+    position: relative;
+    padding-bottom: 24px;
+    min-width: 0;
+  }
+
+  .etape-verticale:last-child { padding-bottom: 0; }
+
+  .etape-verticale::before {
+    content: '';
+    position: absolute;
+    left: 15px;
+    top: 34px;
+    bottom: 0;
+    width: 1px;
+    background: repeating-linear-gradient(to bottom, #E2E2EC 0, #E2E2EC 4px, transparent 4px, transparent 8px);
+  }
+
+  .etape-verticale:last-child::before { display: none; }
+
+  .num-etape {
+    flex-shrink: 0;
+    width: 32px;
+    height: 32px;
+    border-radius: 9px;
+    background: #FFFFFF;
+    border: 1px solid var(--couleur-bordure);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--couleur-primaire);
+    z-index: 1;
+  }
+
+  .num-etape svg { width: 15px; height: 15px; }
+
+  .etape-verticale.actif .num-etape {
+    background: var(--couleur-primaire-fonce);
+    border-color: var(--couleur-primaire-fonce);
+    color: #FFFFFF;
+  }
+
+  .texte-etape { min-width: 0; padding-top: 4px; }
+  .texte-etape .titre-etape { font-size: 13.5px; font-weight: 700; color: var(--couleur-texte); margin-bottom: 3px; }
+  .texte-etape .desc-etape { font-size: 12.5px; color: #8B8B9E; line-height: 1.5; }
+
+  /* ---- Résultat ---- */
+  .resultat-analyse {
+    grid-column: 1 / -1;
+    margin-top: 8px;
+    padding: 24px;
+    border-radius: 14px;
+    background: #F0FBF3;
+    border: 1px solid #C8EED2;
+    min-width: 0;
+  }
+
+  .resultat-analyse h5 {
+    display: flex; align-items: center; gap: 8px;
+    font-size: 14.5px; font-weight: 700; color: #15803D; margin: 0 0 18px 0;
+  }
+
+  .resultat-analyse h5 svg {
+    background: #DCFCE7;
+    border-radius: 999px;
+    padding: 4px;
+    width: 22px;
+    height: 22px;
+  }
+
+  .grille-resultat { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; }
+
+  .champ-resultat {
+    display: flex; gap: 12px; align-items: flex-start; min-width: 0;
+    background: #FFFFFF;
+    border: 1px solid #DCF0E1;
+    border-radius: 10px;
+    padding: 14px;
+  }
+
+  .icone-champ {
+    flex-shrink: 0; width: 30px; height: 30px; border-radius: 8px;
+    background: #F0FBF3; border: 1px solid #DCF0E1;
+    display: flex; align-items: center; justify-content: center; color: #16A34A;
+  }
+  .icone-champ svg { width: 15px; height: 15px; }
+
+  .texte-champ { min-width: 0; }
+  .texte-champ .label-champ {
+    font-size: 10.5px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.05em; color: #6B8F76; margin-bottom: 3px;
+  }
+  .texte-champ .valeur-champ {
+    font-size: 13.5px; color: #1E3A24; line-height: 1.5;
+    word-wrap: break-word;
+  }
+
+  @media (max-width: 900px) {
+    .grille-principale { grid-template-columns: minmax(0, 1fr); }
+    .grille-resultat { grid-template-columns: minmax(0, 1fr); }
+    .carte-depot { padding: 24px 20px; }
+  }
+</style>
+
+<div class="page-depot mb-5">
+
+    <div class="entete-page">
+        <div class="icone-page">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="22" height="22">
+                <path d="M12 16V4M12 4l-4 4M12 4l4 4" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M4 16v3a1 1 0 001 1h14a1 1 0 001-1v-3" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+        </div>
+        <div>
+            <h3>Déposer un nouveau document</h3>
+            <p>Analyse et classification automatiques par intelligence artificielle</p>
+        </div>
+    </div>
+
+    <div class="carte-depot">
+        <div class="grille-principale">
+            <div class="colonne-depot">
+                <form method="POST" enctype="multipart/form-data" data-chargement id="formulaire-depot" style="display:flex; flex-direction:column; flex:1; min-width:0;">
+                    <label class="zone-depot" id="zone-depot" for="input-fichier">
+                        <div class="icone-upload-conteneur">
+                            <svg class="icone-upload-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                                <path d="M12 16V4M12 4l-4.5 4.5M12 4l4.5 4.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M4 17v2a2 2 0 002 2h12a2 2 0 002-2v-2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </div>
+                        <div class="texte-principal">Cliquez ou glissez votre fichier ici</div>
+                        <div class="texte-secondaire">Taille maximale recommandée : 20 Mo</div>
+                        <div class="badges-format">
+                            <span class="badge-format">PDF</span>
+                            <span class="badge-format">DOCX</span>
+                        </div>
+                        <div class="nom-fichier-choisi" id="nom-fichier-choisi"></div>
+                    </label>
+                    <input type="file" id="input-fichier" name="fichier" accept=".pdf,.docx" required>
+
+                    <div class="barre-progression" id="barre-progression">
+                        <div class="barre-progression-remplissage" id="barre-progression-remplissage"></div>
+                    </div>
+
+                    <button type="submit" class="btn-analyser" id="btn-analyser">
+                        <svg viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12 3l1.5 4.5L18 9l-4.5 1.5L12 15l-1.5-4.5L6 9l4.5-1.5L12 3z"/>
+                        </svg>
+                        <span id="btn-analyser-texte">Analyser et enregistrer</span>
+                    </button>
+                    <div class="note-confidentialite">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V7a4 4 0 018 0v4"/>
+                        </svg>
+                        Vos documents restent confidentiels et ne sont accessibles qu'aux utilisateurs autorisés
+                    </div>
+                </form>
+            </div>
+
+            <div class="panneau-pipeline">
+                <h4>Ce qui se passe après le dépôt</h4>
+
+                <div class="etape-verticale actif">
+                    <div class="num-etape">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6"/>
+                        </svg>
+                    </div>
+                    <div class="texte-etape">
+                        <div class="titre-etape">Lecture du contenu</div>
+                        <div class="desc-etape">Extraction du texte et de la structure du document</div>
+                    </div>
+                </div>
+
+                <div class="etape-verticale">
+                    <div class="num-etape">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1"/>
+                        </svg>
+                    </div>
+                    <div class="texte-etape">
+                        <div class="titre-etape">Classification automatique</div>
+                        <div class="desc-etape">Détection du type et de la catégorie du document par IA</div>
+                    </div>
+                </div>
+
+                <div class="etape-verticale">
+                    <div class="num-etape">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M4 6h16M4 12h16M4 18h10" stroke-linecap="round"/>
+                        </svg>
+                    </div>
+                    <div class="texte-etape">
+                        <div class="titre-etape">Résumé et indexation</div>
+                        <div class="desc-etape">Génération d'un résumé et ajout à la recherche sémantique</div>
+                    </div>
+                </div>
+            </div>
+
+            {% if resultat_analyse %}
+            <div class="resultat-analyse">
+                <h5>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                        <path d="M20 6L9 17l-5-5" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    Document déposé avec succès
+                </h5>
+                <div class="grille-resultat">
+                    <div class="champ-resultat">
+                        <div class="icone-champ">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6"/>
+                            </svg>
+                        </div>
+                        <div class="texte-champ">
+                            <div class="label-champ">Nom</div>
+                            <div class="valeur-champ">{{ resultat_analyse.nom }}</div>
+                        </div>
+                    </div>
+                    <div class="champ-resultat">
+                        <div class="icone-champ">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M3 7a2 2 0 012-2h4l2 2h8a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V7z"/>
+                            </svg>
+                        </div>
+                        <div class="texte-champ">
+                            <div class="label-champ">Catégorie détectée</div>
+                            <div class="valeur-champ">{{ resultat_analyse.categorie }}</div>
+                        </div>
+                    </div>
+                    <div class="champ-resultat">
+                        <div class="icone-champ">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M4 6h16M4 12h16M4 18h10" stroke-linecap="round"/>
+                            </svg>
+                        </div>
+                        <div class="texte-champ">
+                            <div class="label-champ">Résumé</div>
+                            <div class="valeur-champ">{{ resultat_analyse.resume }}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<script>
+    const zoneDepot = document.getElementById('zone-depot');
+    const inputFichier = document.getElementById('input-fichier');
+    const nomFichier = document.getElementById('nom-fichier-choisi');
+    const formulaire = document.getElementById('formulaire-depot');
+    const btnAnalyser = document.getElementById('btn-analyser');
+    const btnAnalyserTexte = document.getElementById('btn-analyser-texte');
+    const barreProgression = document.getElementById('barre-progression');
+    const barreProgressionRemplissage = document.getElementById('barre-progression-remplissage');
+
+    ['dragover', 'dragenter'].forEach(evenement => {
+        zoneDepot.addEventListener(evenement, function (e) {
+            e.preventDefault();
+            zoneDepot.classList.add('survol');
+        });
+    });
+
+    ['dragleave', 'drop'].forEach(evenement => {
+        zoneDepot.addEventListener(evenement, function (e) {
+            e.preventDefault();
+            zoneDepot.classList.remove('survol');
+        });
+    });
+
+    zoneDepot.addEventListener('drop', function (e) {
+        inputFichier.files = e.dataTransfer.files;
+        afficherNomFichier();
+    });
+
+    inputFichier.addEventListener('change', afficherNomFichier);
+
+    function afficherNomFichier() {
+        if (inputFichier.files.length > 0) {
+            nomFichier.innerHTML = `
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6"/>
+                </svg>
+                ${inputFichier.files[0].name}`;
+            nomFichier.style.display = 'flex';
+        }
+    }
+
+    // Retour visuel pendant l'envoi (analyse pouvant prendre quelques secondes)
+    formulaire.addEventListener('submit', function () {
+        if (inputFichier.files.length === 0) return;
+        btnAnalyser.disabled = true;
+        btnAnalyserTexte.textContent = 'Analyse en cours...';
+        barreProgression.style.display = 'block';
+        let valeur = 0;
+        const intervalle = setInterval(() => {
+            valeur = Math.min(valeur + Math.random() * 15, 90);
+            barreProgressionRemplissage.style.width = valeur + '%';
+        }, 300);
+        formulaire.dataset.intervalle = intervalle;
+    });
+</script>
+{% endblock %}

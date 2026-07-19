@@ -1,0 +1,338 @@
+{% extends "base.html" %}
+{% set page_active = 'dashboard' %}
+{% block titre %}Tableau de bord — ZenDoc{% endblock %}
+
+{% block contenu %}
+
+<style>
+  :root {
+    --couleur-primaire: #4338CA;
+    --couleur-primaire-fonce: #312C7D;
+    --couleur-texte: #1B1B2E;
+    --couleur-texte-secondaire: #6B7280;
+    --couleur-bordure: #E5E7EB;
+    --couleur-fond-page: #F8F9FC;
+  }
+
+  .page-dashboard {
+    font-family: 'Inter', -apple-system, 'Segoe UI', sans-serif;
+    width: 100%; max-width: 1320px; margin: 0 auto; box-sizing: border-box; padding: 0 24px;
+  }
+  .page-dashboard *, .page-dashboard *::before, .page-dashboard *::after { box-sizing: border-box; }
+
+  .entete-page { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; margin-bottom: 24px; }
+  .entete-page-gauche { display: flex; align-items: center; gap: 16px; }
+  .icone-page {
+    flex-shrink: 0; width: 48px; height: 48px; border-radius: 12px;
+    background: linear-gradient(135deg, #4338CA, #312C7D);
+    display: flex; align-items: center; justify-content: center; color: #fff;
+    box-shadow: 0 4px 12px rgba(67, 56, 202, 0.25);
+  }
+  .entete-page h3 { font-size: 22px; font-weight: 700; color: var(--couleur-texte); margin: 0 0 2px 0; letter-spacing: -0.02em; }
+  .entete-page p { font-size: 14px; color: var(--couleur-texte-secondaire); margin: 0; }
+  .badge-direct { display: flex; align-items: center; gap: 7px; font-size: 12.5px; font-weight: 600; color: var(--couleur-texte-secondaire); background: #FFFFFF; border: 1px solid var(--couleur-bordure); border-radius: 999px; padding: 7px 14px; }
+  .point-direct { width: 7px; height: 7px; border-radius: 50%; background: #16A34A; animation: pulsation 1.6s ease-in-out infinite; }
+  @keyframes pulsation { 0%,100% { opacity: 1; } 50% { opacity: 0.35; } }
+
+  .grille-kpi { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; margin-bottom: 20px; }
+  .carte-kpi {
+    display: flex; align-items: center; gap: 14px;
+    background: #FFFFFF; border: 1px solid var(--couleur-bordure); border-radius: 14px; padding: 18px 20px;
+    box-shadow: 0 1px 3px rgba(16, 24, 40, 0.05); transition: transform 0.2s ease, box-shadow 0.25s ease;
+  }
+  .carte-kpi:hover { transform: translateY(-3px); box-shadow: 0 12px 26px rgba(16, 24, 40, 0.1); }
+  .icone-kpi { flex-shrink: 0; width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; }
+  .icone-kpi svg { width: 20px; height: 20px; }
+  .icone-kpi.documents { background: #EEF2FF; color: #4338CA; }
+  .icone-kpi.utilisateurs { background: #FDF2F8; color: #DB2777; }
+  .icone-kpi.actions { background: #ECFDF5; color: #16A34A; }
+  .icone-kpi.espace { background: #FEF3E2; color: #B45309; }
+  .valeur-kpi { font-size: 24px; font-weight: 700; color: var(--couleur-texte); line-height: 1.1; }
+  .label-kpi { font-size: 12.5px; color: var(--couleur-texte-secondaire); margin-top: 3px; }
+
+  .grille-top { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; margin-bottom: 20px; }
+  .carte-top { display: flex; align-items: center; gap: 16px; background: #FFFFFF; border: 1px solid var(--couleur-bordure); border-radius: 14px; padding: 18px 20px; transition: box-shadow 0.2s ease; }
+  .carte-top:hover { box-shadow: 0 8px 20px rgba(16, 24, 40, 0.07); }
+  .carte-top .icone-top { flex-shrink: 0; width: 46px; height: 46px; border-radius: 12px; display: flex; align-items: center; justify-content: center; color: #fff; }
+  .carte-top.categorie .icone-top { background: linear-gradient(135deg, #EC4899, #DB2777); }
+  .carte-top.action .icone-top { background: linear-gradient(135deg, #6366F1, #4338CA); }
+  .carte-top .icone-top svg { width: 20px; height: 20px; }
+  .carte-top .libelle-top { font-size: 12px; color: var(--couleur-texte-secondaire); margin-bottom: 2px; }
+  .carte-top .valeur-top { font-size: 17px; font-weight: 700; color: var(--couleur-texte); }
+  .carte-top .sous-valeur-top { font-size: 12px; color: var(--couleur-texte-secondaire); margin-top: 1px; }
+
+  .grille-graphes { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 18px; margin-bottom: 18px; }
+  .grille-graphes-deux { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; margin-bottom: 18px; }
+
+  .carte-graphe { background: #FFFFFF; border: 1px solid var(--couleur-bordure); border-radius: 16px; padding: 22px; display: flex; flex-direction: column; min-width: 0; box-shadow: 0 1px 3px rgba(16, 24, 40, 0.05); transition: box-shadow 0.2s ease; }
+  .carte-graphe:hover { box-shadow: 0 10px 24px rgba(16, 24, 40, 0.08); }
+  .entete-graphe { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; gap: 10px; }
+  .entete-graphe h5 { font-size: 14.5px; font-weight: 700; color: var(--couleur-texte); margin: 0 0 2px 0; }
+  .entete-graphe .sous-titre-graphe { font-size: 12px; color: var(--couleur-texte-secondaire); }
+  .badge-total-graphe { flex-shrink: 0; font-size: 11.5px; font-weight: 700; color: var(--couleur-primaire-fonce); background: #EEF2FF; border: 1px solid #E0E7FF; border-radius: 999px; padding: 4px 11px; white-space: nowrap; }
+  .conteneur-graphe { position: relative; flex: 1; min-height: 190px; max-height: 220px; }
+  .conteneur-graphe.moyen { min-height: 240px; }
+
+  .liste-repartition { display: flex; flex-direction: column; gap: 6px; }
+  .ligne-repartition { display: flex; align-items: center; gap: 12px; padding: 8px; border-radius: 10px; transition: background 0.15s ease; }
+  .ligne-repartition:hover { background: var(--couleur-fond-page); }
+  .rang-repartition { flex-shrink: 0; width: 24px; height: 24px; border-radius: 7px; background: var(--couleur-fond-page); color: var(--couleur-texte-secondaire); font-size: 11.5px; font-weight: 700; display: flex; align-items: center; justify-content: center; }
+  .contenu-repartition { flex: 1; min-width: 0; }
+  .nom-repartition { display: flex; justify-content: space-between; font-size: 13px; font-weight: 600; color: var(--couleur-texte); margin-bottom: 5px; }
+  .nom-repartition span:last-child { color: var(--couleur-texte-secondaire); font-weight: 500; }
+  .barre-repartition { width: 100%; height: 6px; background: var(--couleur-fond-page); border-radius: 999px; overflow: hidden; }
+  .barre-repartition-remplissage { height: 100%; border-radius: 999px; background: linear-gradient(90deg, #6366F1, #4338CA); transition: width 0.6s ease; }
+  .barre-repartition-remplissage.verte { background: linear-gradient(90deg, #34D399, #16A34A); }
+
+  .pied-carte { display: flex; align-items: center; justify-content: space-between; margin-top: 16px; padding-top: 14px; border-top: 1px solid #F1F1F6; font-size: 12px; color: var(--couleur-texte-secondaire); }
+  .pied-carte strong { color: var(--couleur-texte); font-weight: 700; }
+
+  .carte-activite { background: #FFFFFF; border: 1px solid var(--couleur-bordure); border-radius: 16px; padding: 22px; box-shadow: 0 1px 3px rgba(16, 24, 40, 0.05); }
+  .ligne-activite-flux { display: flex; align-items: center; gap: 14px; padding: 12px 4px; border-bottom: 1px solid #F3F3F8; transition: background 0.15s ease; }
+  .ligne-activite-flux:hover { background: var(--couleur-fond-page); border-radius: 8px; }
+  .ligne-activite-flux:last-child { border-bottom: none; }
+  .icone-activite-flux { flex-shrink: 0; width: 34px; height: 34px; border-radius: 10px; display: flex; align-items: center; justify-content: center; background: #EEF2FF; color: #4338CA; }
+.icone-activite-flux.icone-upload { background: #ECFDF5; color: #16A34A; }
+.icone-activite-flux.icone-recherche { background: #EEF2FF; color: #4338CA; }
+.icone-activite-flux.icone-telechargement { background: #FEF3E2; color: #B45309; }
+.icone-activite-flux.icone-suppression { background: #FEE2E2; color: #DC2626; }
+.icone-activite-flux.icone-modification { background: #FDF2F8; color: #DB2777; }
+  .icone-activite-flux svg { width: 15px; height: 15px; }
+  .texte-activite-flux { flex: 1; min-width: 0; font-size: 13.5px; color: var(--couleur-texte); }
+  .date-activite-flux { flex-shrink: 0; font-size: 12px; color: #9CA3AF; white-space: nowrap; }
+
+  @media (max-width: 1000px) {
+    .grille-kpi { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .grille-top { grid-template-columns: minmax(0, 1fr); }
+    .grille-graphes { grid-template-columns: minmax(0, 1fr); }
+    .grille-graphes-deux { grid-template-columns: minmax(0, 1fr); }
+  }
+</style>
+
+<div class="page-dashboard mb-5">
+
+    <div class="entete-page">
+        <div class="entete-page-gauche">
+            <div class="icone-page">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="22" height="22">
+                    <path d="M3 3v18h18" stroke-linecap="round" stroke-linejoin="round"/><path d="M7 15l4-4 3 3 5-6" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </div>
+            <div>
+                <h3>Tableau de bord</h3>
+                <p>Vue d'ensemble de l'activité et de l'utilisation de la plateforme</p>
+            </div>
+        </div>
+        <span class="badge-direct"><span class="point-direct"></span>Données en direct</span>
+    </div>
+
+    <!-- ---- KPI ---- -->
+    <div class="grille-kpi">
+        <div class="carte-kpi">
+            <div class="icone-kpi documents"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6"/></svg></div>
+            <div><div class="valeur-kpi">{{ stats.total_documents }}</div><div class="label-kpi">Documents</div></div>
+        </div>
+        <div class="carte-kpi">
+            <div class="icone-kpi utilisateurs"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-7 8-7s8 3 8 7"/></svg></div>
+            <div><div class="valeur-kpi">{{ stats.total_utilisateurs }}</div><div class="label-kpi">Utilisateurs actifs</div></div>
+        </div>
+        <div class="carte-kpi">
+            <div class="icone-kpi actions"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 17l6-6 4 4 8-8" stroke-linecap="round" stroke-linejoin="round"/><path d="M17 7h4v4" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+            <div><div class="valeur-kpi">{{ stats.total_actions }}</div><div class="label-kpi">Actions enregistrées</div></div>
+        </div>
+        <div class="carte-kpi">
+            <div class="icone-kpi espace"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v14c0 1.7 3.6 3 8 3s8-1.3 8-3V5"/><path d="M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3"/></svg></div>
+            <div><div class="valeur-kpi">{{ stats.taille_totale_mo }} Mo</div><div class="label-kpi">Espace utilisé</div></div>
+        </div>
+    </div>
+
+    <!-- ---- Top catégorie / Top action ---- -->
+    <div class="grille-top">
+        <div class="carte-top categorie">
+            <div class="icone-top"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7a2 2 0 012-2h4l2 2h8a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V7z"/></svg></div>
+            <div>
+                <div class="libelle-top">Catégorie la plus fournie</div>
+                <div class="valeur-top" id="top-categorie-nom">—</div>
+                <div class="sous-valeur-top" id="top-categorie-detail">—</div>
+            </div>
+        </div>
+        <div class="carte-top action">
+            <div class="icone-top"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L4 14h7l-1 8 9-12h-7l1-8z"/></svg></div>
+            <div>
+                <div class="libelle-top">Action la plus fréquente</div>
+                <div class="valeur-top" id="top-action-nom">—</div>
+                <div class="sous-valeur-top" id="top-action-detail">—</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ---- Graphiques principaux ---- -->
+    <div class="grille-graphes">
+        <div class="carte-graphe">
+            <div class="entete-graphe">
+                <div><h5>Répartition par catégorie</h5><span class="sous-titre-graphe">Classification automatique des documents</span></div>
+                <span class="badge-total-graphe" id="badge-total-categories">0</span>
+            </div>
+            <div class="conteneur-graphe"><canvas id="graphe-categories"></canvas></div>
+        </div>
+
+        <div class="carte-graphe">
+            <div class="entete-graphe">
+                <div><h5>Répartition des actions</h5><span class="sous-titre-graphe">Type d'actions effectuées sur la plateforme</span></div>
+                <span class="badge-total-graphe" id="badge-total-actions">0</span>
+            </div>
+            <div class="conteneur-graphe"><canvas id="graphe-actions"></canvas></div>
+            <div class="pied-carte" id="pied-actions" style="display:none;">
+                <span>Action la plus fréquente</span>
+                <strong id="action-dominante-pied">—</strong>
+            </div>
+        </div>
+    </div>
+
+    <!-- ---- Vues alternatives ---- -->
+    <div class="grille-graphes-deux">
+        <div class="carte-graphe">
+            <div class="entete-graphe"><div><h5>Vue polaire — catégories</h5><span class="sous-titre-graphe">Autre lecture visuelle</span></div></div>
+            <div class="conteneur-graphe moyen"><canvas id="graphe-polaire"></canvas></div>
+        </div>
+
+        <div class="carte-graphe">
+            <div class="entete-graphe"><div><h5>Actions — vue proportionnelle</h5><span class="sous-titre-graphe">Poids de chaque type d'action</span></div></div>
+            <div class="conteneur-graphe moyen"><canvas id="graphe-actions-donut"></canvas></div>
+        </div>
+    </div>
+
+    <!-- ---- Classements détaillés ---- -->
+    <div class="grille-graphes">
+        <div class="carte-graphe">
+            <div class="entete-graphe"><div><h5>Documents par catégorie</h5><span class="sous-titre-graphe">Classement détaillé</span></div></div>
+            <div id="liste-categories" class="liste-repartition"></div>
+        </div>
+
+        <div class="carte-graphe">
+            <div class="entete-graphe"><div><h5>Volume par type d'action</h5><span class="sous-titre-graphe">Classement détaillé</span></div></div>
+            <div id="liste-actions" class="liste-repartition"></div>
+        </div>
+    </div>
+
+    <!-- ---- Activité récente ---- -->
+    <div class="carte-activite">
+        <div class="entete-graphe"><div><h5>Activité récente</h5></div></div>
+       {% for action in actions_recentes %}
+<div class="ligne-activite-flux">
+    <div class="icone-activite-flux icone-{{ action.action }}">
+        {% if action.action == 'upload' %}
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v12" stroke-linecap="round"/><path d="M7 8l5-5 5 5" stroke-linecap="round" stroke-linejoin="round"/><path d="M4 17v2a2 2 0 002 2h12a2 2 0 002-2v-2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        {% elif action.action == 'recherche' %}
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3" stroke-linecap="round"/></svg>
+        {% elif action.action == 'telechargement' %}
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v12" stroke-linecap="round"/><path d="M7 10l5 5 5-5" stroke-linecap="round" stroke-linejoin="round"/><path d="M4 17v2a2 2 0 002 2h12a2 2 0 002-2v-2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        {% elif action.action == 'suppression' %}
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18" stroke-linecap="round"/><path d="M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2" stroke-linecap="round" stroke-linejoin="round"/><path d="M6 6l1 14a2 2 0 002 2h6a2 2 0 002-2l1-14" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        {% elif action.action == 'modification' %}
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9" stroke-linecap="round"/><path d="M16.5 3.5a2.1 2.1 0 013 3L7 19l-4 1 1-4L16.5 3.5z" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        {% else %}
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        {% endif %}
+    </div>
+    <div class="texte-activite-flux">{{ action.details }}</div>
+    <div class="date-activite-flux">{{ action.date }} · {{ action.utilisateur }}</div>
+</div>
+{% else %}
+<p style="text-align:center; color:var(--couleur-texte-secondaire); font-size:13px; padding:20px 0;">Aucune activité récente.</p>
+{% endfor %}
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+<script>
+    const categoriesLabels  = {{ (categories_labels or [])|tojson }};
+    const categoriesValeurs = {{ (categories_valeurs or [])|tojson }};
+    const actionsLabels     = {{ (actions_labels or [])|tojson }};
+    const actionsValeurs    = {{ (actions_valeurs or [])|tojson }};
+
+    const palette = ['#4338CA', '#06B6D4', '#D97706', '#16A34A', '#DB2777', '#7C3AED', '#F59E0B', '#0EA5E9', '#EF4444', '#0D9488'];
+    Chart.defaults.font.family = "'Inter', -apple-system, 'Segoe UI', sans-serif";
+    Chart.defaults.color = '#6B7280';
+    const tooltipSombre = { backgroundColor: '#1B1B2E', padding: 10, cornerRadius: 8 };
+
+    // ---- Répartition par catégorie : donut (légende à gauche) + polaire + classement ----
+    const totalCategories = categoriesValeurs.reduce((a, v) => a + v, 0);
+    document.getElementById('badge-total-categories').textContent = totalCategories + ' document(s)';
+
+    new Chart(document.getElementById('graphe-categories'), {
+        type: 'doughnut',
+        data: { labels: categoriesLabels, datasets: [{ data: categoriesValeurs, backgroundColor: palette, borderWidth: 2, borderColor: '#FFFFFF', hoverOffset: 6 }] },
+        options: {
+            responsive: true, maintainAspectRatio: false, cutout: '65%',
+            plugins: {
+                legend: {
+                    display: true,
+                    position: 'left',
+                    labels: { boxWidth: 10, font: { size: 11 }, padding: 10 }
+                },
+                tooltip: { ...tooltipSombre, callbacks: { label: c => {
+                    const t = c.dataset.data.reduce((a,b)=>a+b,0);
+                    return ` ${c.label} : ${c.raw} (${t>0?Math.round(c.raw/t*100):0}%)`;
+                }}}
+            }
+        }
+    });
+
+    new Chart(document.getElementById('graphe-polaire'), {
+        type: 'polarArea',
+        data: { labels: categoriesLabels, datasets: [{ data: categoriesValeurs, backgroundColor: palette.map(c => c + 'CC'), borderWidth: 1, borderColor: '#FFFFFF' }] },
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, tooltip: tooltipSombre }, scales: { r: { ticks: { display: false }, grid: { color: '#F1F1F6' } } } }
+    });
+
+    const maxCat = Math.max(...categoriesValeurs, 1);
+    document.getElementById('liste-categories').innerHTML = categoriesLabels.map((l, i) => `
+        <div class="ligne-repartition">
+            <div class="rang-repartition">${i + 1}</div>
+            <div class="contenu-repartition">
+                <div class="nom-repartition"><span>${l}</span><span>${categoriesValeurs[i]}</span></div>
+                <div class="barre-repartition"><div class="barre-repartition-remplissage" style="width:${(categoriesValeurs[i] / maxCat) * 100}%;"></div></div>
+            </div>
+        </div>`).join('');
+
+    if (categoriesValeurs.length > 0 && totalCategories > 0) {
+        const indexMaxCat = categoriesValeurs.indexOf(Math.max(...categoriesValeurs));
+        document.getElementById('top-categorie-nom').textContent = categoriesLabels[indexMaxCat];
+        document.getElementById('top-categorie-detail').textContent = `${categoriesValeurs[indexMaxCat]} document(s) — ${Math.round((categoriesValeurs[indexMaxCat] / totalCategories) * 100)}% du total`;
+    }
+
+    // ---- Répartition des actions : barres + donut + classement ----
+    const totalActions = actionsValeurs.reduce((a, v) => a + v, 0);
+    document.getElementById('badge-total-actions').textContent = totalActions + ' action(s)';
+
+    new Chart(document.getElementById('graphe-actions'), {
+        type: 'bar',
+        data: { labels: actionsLabels, datasets: [{ label: 'Actions', data: actionsValeurs, backgroundColor: '#A5B4FC', hoverBackgroundColor: '#4338CA', borderRadius: 6, maxBarThickness: 34 }] },
+        options: { responsive: true, maintainAspectRatio: false, indexAxis: 'y', plugins: { legend: { display: false }, tooltip: tooltipSombre }, scales: { x: { beginAtZero: true, grid: { color: '#F1F1F6' }, ticks: { precision: 0 } }, y: { grid: { display: false } } } }
+    });
+
+    new Chart(document.getElementById('graphe-actions-donut'), {
+        type: 'doughnut',
+        data: { labels: actionsLabels, datasets: [{ data: actionsValeurs, backgroundColor: palette.slice().reverse(), borderWidth: 2, borderColor: '#FFFFFF' }] },
+        options: { responsive: true, maintainAspectRatio: false, cutout: '60%', plugins: { legend: { position: 'bottom', labels: { boxWidth: 8, font: { size: 11 } } }, tooltip: tooltipSombre } }
+    });
+
+    if (actionsValeurs.length > 0 && totalActions > 0) {
+        const indexMaxAction = actionsValeurs.indexOf(Math.max(...actionsValeurs));
+        document.getElementById('top-action-nom').textContent = actionsLabels[indexMaxAction];
+        document.getElementById('top-action-detail').textContent = `${actionsValeurs[indexMaxAction]} occurrence(s) — ${Math.round((actionsValeurs[indexMaxAction] / totalActions) * 100)}% du total`;
+        document.getElementById('pied-actions').style.display = 'flex';
+        document.getElementById('action-dominante-pied').textContent = `${actionsLabels[indexMaxAction]} (${actionsValeurs[indexMaxAction]})`;
+    }
+
+    const maxAction = Math.max(...actionsValeurs, 1);
+    document.getElementById('liste-actions').innerHTML = actionsLabels.map((l, i) => `
+        <div class="ligne-repartition">
+            <div class="rang-repartition">${i + 1}</div>
+            <div class="contenu-repartition">
+                <div class="nom-repartition"><span>${l}</span><span>${actionsValeurs[i]}</span></div>
+                <div class="barre-repartition"><div class="barre-repartition-remplissage verte" style="width:${(actionsValeurs[i] / maxAction) * 100}%;"></div></div>
+            </div>
+        </div>`).join('');
+</script>
+{% endblock %}

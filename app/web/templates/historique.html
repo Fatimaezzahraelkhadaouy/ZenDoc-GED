@@ -1,0 +1,193 @@
+{% extends "base.html" %}
+{% block titre %}Historique — ZenDoc{% endblock %}
+
+{% block contenu %}
+{% set page_active = 'historique' %}
+
+<style>
+  .page-historique {
+    font-family: 'Inter', -apple-system, 'Segoe UI', sans-serif;
+    width: 100%; max-width: 1320px; margin: 0 auto; box-sizing: border-box; padding: 0 24px 40px;
+  }
+  .page-historique *, .page-historique *::before, .page-historique *::after { box-sizing: border-box; }
+
+  .entete-historique { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; margin-bottom: 24px; }
+  .entete-historique-gauche { display: flex; align-items: center; gap: 16px; }
+  .icone-entete-historique {
+    flex-shrink: 0; width: 48px; height: 48px; border-radius: 12px;
+    background: linear-gradient(135deg, #4338CA, #312C7D);
+    display: flex; align-items: center; justify-content: center; color: #fff;
+    box-shadow: 0 4px 12px rgba(67, 56, 202, 0.25);
+  }
+  .entete-historique h3 { font-size: 22px; font-weight: 700; color: #1B1B2E; margin: 0 0 2px 0; letter-spacing: -0.02em; }
+  .entete-historique p { font-size: 14px; color: #6B7280; margin: 0; }
+
+  .grille-mini-stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; margin-bottom: 24px; }
+  .mini-carte-hist { background: #FFFFFF; border: 1px solid #E5E7EB; border-radius: 14px; padding: 16px 18px; display: flex; align-items: center; gap: 12px; transition: box-shadow 0.2s ease; }
+  .mini-carte-hist:hover { box-shadow: 0 8px 20px rgba(16, 24, 40, 0.07); }
+  .mini-icone-hist { flex-shrink: 0; width: 38px; height: 38px; border-radius: 10px; display: flex; align-items: center; justify-content: center; }
+  .mini-icone-hist svg { width: 17px; height: 17px; }
+  .mini-valeur-hist { font-size: 19px; font-weight: 700; color: #1B1B2E; line-height: 1.1; }
+  .mini-label-hist { font-size: 11.5px; color: #6B7280; margin-top: 2px; }
+
+  .carte-historique { background: #FFFFFF; border: 1px solid #E5E7EB; border-radius: 16px; padding: 22px; box-shadow: 0 1px 3px rgba(16, 24, 40, 0.05); }
+
+  .barre-filtres { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 18px; }
+  .filtre-badge {
+    border: 1px solid #E5E7EB; background: #F8F9FC; color: #6B7280; font-size: 12.5px; font-weight: 600;
+    padding: 6px 14px; border-radius: 999px; cursor: pointer; transition: all 0.15s ease; text-decoration: none;
+  }
+  .filtre-badge:hover { background: #EEF2FF; color: #4338CA; }
+  .filtre-badge.actif { background: #4338CA; color: #fff; border-color: #4338CA; }
+
+  .tableau-historique { width: 100%; border-collapse: collapse; }
+  .tableau-historique thead th {
+    text-align: left; font-size: 11.5px; text-transform: uppercase; letter-spacing: 0.04em;
+    color: #9CA3AF; font-weight: 700; padding: 10px 12px; border-bottom: 1px solid #F1F1F6;
+  }
+  .tableau-historique tbody tr { transition: background 0.15s ease; }
+  .tableau-historique tbody tr:hover { background: #F8F9FC; }
+  .tableau-historique tbody td { padding: 13px 12px; font-size: 13.5px; color: #1B1B2E; border-bottom: 1px solid #F3F3F8; }
+  .tableau-historique tbody tr:last-child td { border-bottom: none; }
+
+  .cellule-date { display: flex; flex-direction: column; }
+  .cellule-date .jour { font-weight: 600; font-size: 13px; }
+  .cellule-date .heure { font-size: 11.5px; color: #9CA3AF; }
+
+  .badge-action-hist {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 5px 12px 5px 8px; border-radius: 999px; font-size: 12px; font-weight: 600; text-transform: capitalize; white-space: nowrap;
+  }
+  .badge-action-hist svg { width: 13px; height: 13px; }
+  .badge-action-hist.upload { background: #ECFDF5; color: #16A34A; }
+  .badge-action-hist.recherche { background: #EEF2FF; color: #4338CA; }
+  .badge-action-hist.telechargement { background: #FEF3E2; color: #B45309; }
+  .badge-action-hist.suppression { background: #FEE2E2; color: #DC2626; }
+  .badge-action-hist.modification { background: #FDF2F8; color: #DB2777; }
+  .badge-action-hist.autre { background: #F1F5F9; color: #64748B; }
+
+  .cellule-utilisateur { display: flex; align-items: center; gap: 8px; }
+  .avatar-mini { flex-shrink: 0; width: 26px; height: 26px; border-radius: 50%; background: linear-gradient(135deg, #6366F1, #4338CA); color: #fff; font-size: 11px; font-weight: 700; display: flex; align-items: center; justify-content: center; }
+
+  .etat-vide-hist { text-align: center; padding: 50px 20px; color: #9CA3AF; }
+  .etat-vide-hist svg { width: 40px; height: 40px; margin-bottom: 10px; opacity: 0.5; }
+
+  @media (max-width: 900px) {
+    .grille-mini-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .tableau-historique { display: block; overflow-x: auto; white-space: nowrap; }
+  }
+</style>
+
+<div class="page-historique">
+
+    <div class="entete-historique">
+        <div class="entete-historique-gauche">
+            <div class="icone-entete-historique">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="22" height="22">
+                    <circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </div>
+            <div>
+                <h3>Historique des opérations</h3>
+                <p>
+                    {% if role == 'admin' %}
+                    Vue complète de toutes les actions effectuées sur la plateforme
+                    {% else %}
+                    Vos actions récentes sur la plateforme
+                    {% endif %}
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mini statistiques rapides -->
+    <div class="grille-mini-stats">
+        <div class="mini-carte-hist">
+            <div class="mini-icone-hist" style="background:#EEF2FF; color:#4338CA;">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 17l6-6 4 4 8-8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+            <div><div class="mini-valeur-hist">{{ historique|length }}</div><div class="mini-label-hist">Actions affichées</div></div>
+        </div>
+        <div class="mini-carte-hist">
+            <div class="mini-icone-hist" style="background:#ECFDF5; color:#16A34A;">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v12" stroke-linecap="round"/><path d="M7 8l5-5 5 5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+            <div><div class="mini-valeur-hist">{{ historique|selectattr('action','equalto','upload')|list|length }}</div><div class="mini-label-hist">Dépôts</div></div>
+        </div>
+        <div class="mini-carte-hist">
+            <div class="mini-icone-hist" style="background:#FEF3E2; color:#B45309;">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3" stroke-linecap="round"/></svg>
+            </div>
+            <div><div class="mini-valeur-hist">{{ historique|selectattr('action','equalto','recherche')|list|length }}</div><div class="mini-label-hist">Recherches</div></div>
+        </div>
+        <div class="mini-carte-hist">
+            <div class="mini-icone-hist" style="background:#FEE2E2; color:#DC2626;">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18" stroke-linecap="round"/><path d="M6 6l1 14a2 2 0 002 2h6a2 2 0 002-2l1-14" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+            <div><div class="mini-valeur-hist">{{ historique|selectattr('action','equalto','suppression')|list|length }}</div><div class="mini-label-hist">Suppressions</div></div>
+        </div>
+    </div>
+
+    <!-- Tableau principal -->
+    <div class="carte-historique">
+        <table class="tableau-historique">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Action</th>
+                    <th>Détails</th>
+                    {% if role == 'admin' %}<th>Utilisateur</th>{% endif %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for entree in historique %}
+                <tr>
+                    <td>
+                        <div class="cellule-date">
+                            <span class="jour">{{ entree.date.split(' ')[0] }}</span>
+                            <span class="heure">{{ entree.date.split(' ')[1] }}</span>
+                        </div>
+                    </td>
+                    <td>
+                        <span class="badge-action-hist {{ entree.action if entree.action in ['upload','recherche','telechargement','suppression','modification'] else 'autre' }}">
+                            {% if entree.action == 'upload' %}
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v12" stroke-linecap="round"/><path d="M7 8l5-5 5 5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                            {% elif entree.action == 'recherche' %}
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3" stroke-linecap="round"/></svg>
+                            {% elif entree.action == 'telechargement' %}
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v12" stroke-linecap="round"/><path d="M7 10l5 5 5-5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                            {% elif entree.action == 'suppression' %}
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18" stroke-linecap="round"/><path d="M6 6l1 14a2 2 0 002 2h6a2 2 0 002-2l1-14" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                            {% elif entree.action == 'modification' %}
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16.5 3.5a2.1 2.1 0 013 3L7 19l-4 1 1-4L16.5 3.5z" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                            {% else %}
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/></svg>
+                            {% endif %}
+                            {{ entree.action }}
+                        </span>
+                    </td>
+                    <td>{{ entree.details }}</td>
+                    {% if role == 'admin' %}
+                    <td>
+                        <div class="cellule-utilisateur">
+                            <span class="avatar-mini">{{ entree.utilisateur[0]|upper if entree.utilisateur != '—' else '?' }}</span>
+                            {{ entree.utilisateur }}
+                        </div>
+                    </td>
+                    {% endif %}
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="{{ 4 if role == 'admin' else 3 }}">
+                        <div class="etat-vide-hist">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                            <p>Aucune activité enregistrée pour le moment.</p>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

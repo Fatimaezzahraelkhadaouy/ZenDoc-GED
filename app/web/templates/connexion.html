@@ -1,0 +1,59 @@
+{% extends "base_auth.html" %}
+{% block titre %}Connexion — ZenDoc{% endblock %}
+
+{% block contenu %}
+<div class="page-auth">
+    <div class="conteneur-auth">
+        <div class="carte-auth">
+            <div class="text-center mb-4">
+                <img src="{{ url_for('static', filename='images/logo.svg') }}" alt="Logo ZenDoc" class="icone-logo" style="width: 64px; height: 64px; object-fit: contain;">
+                <h1 class="titre-app">ZenDoc</h1>
+                <p class="sous-titre">Enhanced Technologies</p>
+            </div>
+
+            <ul class="nav nav-tabs nav-fill mb-4" role="tablist">
+                <li class="nav-item">
+                    <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#onglet-connexion">Se connecter</button>
+                </li>
+                <li class="nav-item">
+                    <button class="nav-link" data-bs-toggle="tab" data-bs-target="#onglet-inscription">Créer un compte</button>
+                </li>
+            </ul>
+
+            <div class="tab-content">
+                <div class="tab-pane fade show active" id="onglet-connexion">
+                    <form method="POST" action="{{ url_for('connexion') }}">
+                        <div class="mb-3">
+                            <label class="form-label">Email</label>
+                            <input type="email" name="email" class="form-control form-control-lg" placeholder="votre.email@exemple.com" required>
+                        </div>
+                        <div class="mb-4">
+                            <label class="form-label">Mot de passe</label>
+                            <input type="password" name="mot_de_passe" class="form-control form-control-lg" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-lg w-100">Se connecter</button>
+                    </form>
+                </div>
+
+                <div class="tab-pane fade" id="onglet-inscription">
+                    <form method="POST" action="{{ url_for('inscription') }}">
+                        <div class="mb-3">
+                            <label class="form-label">Nom complet</label>
+                            <input type="text" name="nom_complet" class="form-control form-control-lg" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Email</label>
+                            <input type="email" name="email" class="form-control form-control-lg" required>
+                        </div>
+                        <div class="mb-4">
+                            <label class="form-label">Mot de passe</label>
+                            <input type="password" name="mot_de_passe" class="form-control form-control-lg" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-lg w-100">Créer mon compte</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

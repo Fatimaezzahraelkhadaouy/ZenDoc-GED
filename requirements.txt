@@ -1,0 +1,10 @@
+langchain
+langchain-google-genai
+langchain-community
+chromadb
+gradio
+pypdf
+python-docx
+python-dotenv
+sqlalchemy
+sentence-transformers

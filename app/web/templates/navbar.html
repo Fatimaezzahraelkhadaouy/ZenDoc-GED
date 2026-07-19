@@ -1,0 +1,24 @@
+<div class="sidebar-app">
+    <div class="sidebar-logo">
+        <img src="{{ url_for('static', filename='images/logo.svg') }}" style="width: 30px; height: 30px;" alt="Logo">
+        <span>ZenDoc</span>
+    </div>
+
+    <div class="sidebar-utilisateur">
+        <div class="sidebar-nom">👋 {{ nom }}</div>
+        <span class="badge bg-light text-dark">{{ role }}</span>
+    </div>
+
+    <ul class="sidebar-liens">
+        <li><a class="{{ 'active' if page_active == 'bienvenue' }}" href="{{ url_for('bienvenue') }}">🏠 Accueil</a></li>
+        <li><a class="{{ 'active' if page_active == 'dashboard' }}" href="{{ url_for('dashboard') }}">📊 Tableau de bord</a></li>
+        <li><a class="{{ 'active' if page_active == 'upload' }}" href="{{ url_for('upload') }}">📤 Dépôt</a></li>
+        <li><a class="{{ 'active' if page_active == 'recherche' }}" href="{{ url_for('recherche') }}">🔍 Recherche</a></li>
+        <li><a class="{{ 'active' if page_active == 'chat' }}" href="{{ url_for('chat') }}">💬 Chat</a></li>
+        <li><a class="{{ 'active' if page_active == 'documents' }}" href="{{ url_for('documents') }}">📁 Mes documents</a></li>
+        <li><a class="{{ 'active' if page_active == 'corbeille' }}" href="{{ url_for('corbeille') }}">🗑️ Corbeille</a></li>
+        <li><a class="{{ 'active' if page_active == 'historique' }}" href="{{ url_for('historique') }}">🕑 Historique</a></li>
+    </ul>
+
+    <a href="{{ url_for('deconnexion') }}" class="sidebar-deconnexion">🚪 Déconnexion</a>
+</div>

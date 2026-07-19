@@ -1,0 +1,185 @@
+{% extends "base_auth.html" %}
+{% block titre %}ZenDoc — Enhanced Technologies{% endblock %}
+
+{% block contenu %}
+<nav class="navbar-accueil">
+    <div class="container d-flex justify-content-between align-items-center py-3">
+        <div class="d-flex align-items-center gap-2">
+            <img src="{{ url_for('static', filename='images/logo.svg') }}" style="width: 28px; height: 28px;" alt="Logo">
+            <span class="fw-bold" style="color: #312e81; font-size: 18px;"> ZenDoc</span>
+        </div>
+
+        <ul class="nav-liens-accueil d-none d-lg-flex">
+            <li><a href="#accueil">Accueil</a></li>
+            <li><a href="#apercu">Aperçu</a></li>
+            <li><a href="#fonctionnalites">Fonctionnalités</a></li>
+            <li><a href="#apropos">À propos</a></li>
+            <li><a href="#contact">Contact</a></li>
+        </ul>
+
+        <div>
+            <a href="{{ url_for('connexion') }}" class="btn btn-outline-primary me-2">Se connecter</a>
+            <a href="{{ url_for('inscription') }}" class="btn btn-primary">Commencer</a>
+        </div>
+    </div>
+</nav>
+
+<section class="hero-section" id="accueil">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6">
+                <span class="badge-hero mb-3">Propulsé par l'IA · Gemini & LangChain</span>
+                <h1 class="hero-titre">Gérez vos documents<br>intelligemment</h1>
+                <p class="hero-texte">
+                    Déposez, classez, recherchez et discutez avec vos documents grâce à l'intelligence artificielle.
+                    Une solution complète pensée pour Enhanced Technologies.
+                </p>
+                <div class="mt-4">
+                    <a href="{{ url_for('inscription') }}" class="btn btn-primary btn-lg me-2">Commencer maintenant</a>
+                    <a href="{{ url_for('connexion') }}" class="btn btn-outline-secondary btn-lg">J'ai déjà un compte</a>
+                </div>
+            </div>
+            <div class="col-lg-6 text-center">
+                <img src="{{ url_for('static', filename='images/mon-illustration1.png.png') }}"
+                     class="hero-illustration" alt="Illustration"
+                     style="width: 100%; max-width: 480px; border-radius: 20px; box-shadow: 0 20px 50px rgba(67, 56, 202, 0.25);">
+            </div>
+        </div>
+    </div>
+</section>
+
+<style>
+  .section-apercu { padding: 20px 0 70px 0; }
+
+  .cadre-navigateur {
+    max-width: 800px;
+    margin: 0 auto;
+    background: #F1F1F6;
+    border: 1px solid #E5E7EB;
+    border-radius: 16px;
+    padding: 10px 10px 0 10px;
+    box-shadow: 0 25px 60px rgba(49, 44, 125, 0.18);
+    overflow: hidden;
+  }
+
+  .barre-navigateur {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    padding: 6px 8px 12px 8px;
+  }
+
+  .point-navigateur {
+    width: 11px;
+    height: 11px;
+    border-radius: 50%;
+  }
+
+  .point-navigateur.rouge { background: #FF5F57; }
+  .point-navigateur.jaune { background: #FEBC2E; }
+  .point-navigateur.vert { background: #28C840; }
+
+  .image-apercu {
+    width: 100%;
+    display: block;
+    border-radius: 10px 10px 0 0;
+    border: 1px solid #E5E7EB;
+    border-bottom: none;
+  }
+</style>
+
+</style>
+
+<section class="container section-apercu" id="apercu">
+    <h2 class="text-center titre-section mb-2">Découvrez l'interface</h2>
+    <p class="text-center text-muted mb-5">Un espace de travail clair, pensé pour retrouver vos documents en quelques secondes.</p>
+    <div class="cadre-navigateur">
+        <div class="barre-navigateur">
+            <span class="point-navigateur rouge"></span>
+            <span class="point-navigateur jaune"></span>
+            <span class="point-navigateur vert"></span>
+        </div>
+        <img src="{{ url_for('static', filename='images/apercu.jpg') }}" class="image-apercu" alt="Aperçu de l'application ZenDoc">
+    </div>
+</section>
+
+<section class="container mb-5" id="fonctionnalites">
+    <h2 class="text-center titre-section mb-5">Tout ce dont vous avez besoin</h2>
+    <div class="row g-4">
+        <div class="col-md-4">
+            <div class="carte-feature">
+                <div class="feature-icone">📤</div>
+                <h5>Dépôt intelligent</h5>
+                <p class="text-muted">Déposez vos PDF et Word — l'IA génère automatiquement un résumé et une catégorie.</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="carte-feature">
+                <div class="feature-icone">🔍</div>
+                <h5>Recherche sémantique</h5>
+                <p class="text-muted">Trouvez vos documents par le sens, pas seulement par mots-clés exacts.</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="carte-feature">
+                <div class="feature-icone">💬</div>
+                <h5>Chat avec vos documents</h5>
+                <p class="text-muted">Posez une question, l'assistant IA répond en se basant sur vos documents.</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="carte-feature">
+                <div class="feature-icone">🔐</div>
+                <h5>Sécurité & droits d'accès</h5>
+                <p class="text-muted">Authentification sécurisée et gestion des permissions par utilisateur.</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="carte-feature">
+                <div class="feature-icone">🗑️</div>
+                <h5>Corbeille récupérable</h5>
+                <p class="text-muted">Supprimez sans crainte — vos documents restent récupérables.</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="carte-feature">
+                <div class="feature-icone">📊</div>
+                <h5>Tableau de bord</h5>
+                <p class="text-muted">Visualisez l'activité, les catégories, et l'usage de la plateforme.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="container mb-5" id="apropos">
+    <div class="carte">
+        <h2 class="titre-section text-center mb-4">À propos</h2>
+        <p class="text-muted mb-3">
+            <b>ZenDoc</b> est une plateforme de gestion électronique de documents qui centralise le stockage,
+            la classification et la recherche de vos fichiers dans un espace unique et sécurisé.
+        </p>
+        <p class="text-muted mb-3">
+            Grâce à l'intelligence artificielle, chaque document déposé est automatiquement analysé : un résumé
+            et une catégorie lui sont attribués, ce qui évite le classement manuel. La recherche sémantique permet
+            ensuite de retrouver un document en décrivant simplement ce qu'il contient, plutôt qu'en devinant les
+            mots-clés exacts qu'il utilise.
+        </p>
+        <p class="text-muted mb-0">
+            L'assistant conversationnel va plus loin : il répond directement à vos questions en s'appuyant sur le
+            contenu de vos documents, avec les sources citées à l'appui — pour gagner du temps sans sacrifier la
+            fiabilité de l'information.
+        </p>
+    </div>
+</section>
+
+<section class="container mb-5" id="contact">
+    <div class="carte text-center">
+        <h2 class="titre-section mb-3">Contact</h2>
+        <p class="text-muted">Une question ? Écrivez-nous à <a href="mailto:contact@enhancedtech.ma">enhanced@uai.ma</a></p>
+    </div>
+</section>
+
+<footer class="footer-accueil text-center py-4">
+    <p class="mb-0 text-muted">© 2026 ZenDoc · Enhanced Technologies · Stage Data Science, INSEA</p>
+</footer>
+{% endblock %}
