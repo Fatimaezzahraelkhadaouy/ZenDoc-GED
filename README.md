@@ -199,6 +199,9 @@ zendoc-ged/
 
 ---
 
+
+
+
 ## 🗄 Data Model
 
 8 relational tables: `users`, `documents`, `categories`, `tags`, `document_tags`, `historique`, `permissions`, `feedback`.
