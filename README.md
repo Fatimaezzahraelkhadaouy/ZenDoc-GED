@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="docs/screenshots/banner.png" alt="ZenDoc" width="800"/>
+<img src="banner.png" alt="ZenDoc" width="800"/>
 
 # 📄 ZenDoc
 
@@ -58,16 +58,16 @@ This project was built to apply and showcase core Data Science / AI Engineering 
 
 <table>
 <tr>
-<td width="50%"><img src="docs/screenshots/accueil.png" alt="Home"/><p align="center"><em>Home dashboard</em></p></td>
-<td width="50%"><img src="docs/screenshots/dashboard.png" alt="Analytics dashboard"/><p align="center"><em>Analytics dashboard (Chart.js)</em></p></td>
+<td width="50%"><img src="accueil.png" alt="Home"/><p align="center"><em>Home dashboard</em></p></td>
+<td width="50%"><img src="dashboard.png" alt="Analytics dashboard"/><p align="center"><em>Analytics dashboard (Chart.js)</em></p></td>
 </tr>
 <tr>
-<td width="50%"><img src="docs/screenshots/depot_resultat.png" alt="AI analysis"/><p align="center"><em>Automatic classification &amp; summarization (LLM)</em></p></td>
-<td width="50%"><img src="docs/screenshots/chat.png" alt="AI chat"/><p align="center"><em>RAG-based conversational assistant with cited sources</em></p></td>
+<td width="50%"><img src="depot_resultat.png" alt="AI analysis"/><p align="center"><em>Automatic classification &amp; summarization (LLM)</em></p></td>
+<td width="50%"><img src="chat.png" alt="AI chat"/><p align="center"><em>RAG-based conversational assistant with cited sources</em></p></td>
 </tr>
 <tr>
-<td width="50%"><img src="docs/screenshots/recherche.png" alt="Semantic search"/><p align="center"><em>Semantic search (vector embeddings)</em></p></td>
-<td width="50%"><img src="docs/screenshots/historique.png" alt="Activity log"/><p align="center"><em>Full audit trail / operations history</em></p></td>
+<td width="50%"><img src="recherche.png" alt="Semantic search"/><p align="center"><em>Semantic search (vector embeddings)</em></p></td>
+<td width="50%"><img src="historique.png" alt="Activity log"/><p align="center"><em>Full audit trail / operations history</em></p></td>
 </tr>
 </table>
 
@@ -76,9 +76,9 @@ This project was built to apply and showcase core Data Science / AI Engineering 
 <br>
 <table>
 <tr>
-<td width="33%"><img src="docs/screenshots/mes_documents.png" alt="My documents"/></td>
-<td width="33%"><img src="docs/screenshots/corbeille.png" alt="Trash"/></td>
-<td width="33%"><img src="docs/screenshots/connexion.png" alt="Login"/></td>
+<td width="33%"><img src="mes_documents.png" alt="My documents"/></td>
+<td width="33%"><img src="corbeille.png" alt="Trash"/></td>
+<td width="33%"><img src="connexion.png" alt="Login"/></td>
 </tr>
 </table>
 </details>
@@ -161,7 +161,7 @@ The application is then available at `http://127.0.0.1:8000/`.
 3. Retrieve it by meaning via **Search** (semantic/vector search), or ask questions about it via **Chat** (RAG)
 4. Monitor platform-wide activity from the **Dashboard**
 
-📘 A **complete user guide** (screenshots + step-by-step instructions, French) is available at [`docs/Guide_Utilisateur_ZenDoc.pdf`](docs/Guide_Utilisateur_ZenDoc.pdf).
+📘 A **complete user guide** (screenshots + step-by-step instructions, French) is available at [`Guide_Utilisateur_ZenDoc.pdf`](Guide_Utilisateur_ZenDoc.pdf).
 
 ---
 
@@ -189,12 +189,10 @@ zendoc-ged/
 │       ├── routes.py          # Flask routes
 │       ├── static/            # CSS, JS, images
 │       └── templates/         # Jinja2 templates
-├── docs/
-│   ├── screenshots/            # Screenshots used in this README
-│   └── Guide_Utilisateur_ZenDoc.pdf
 ├── main_web.py                  # Entry point — run this to start the app
 ├── requirements.txt
 ├── .env.example
+├── Guide_Utilisateur_ZenDoc.pdf  # User guide (French)
 └── .gitignore
 ```
 
