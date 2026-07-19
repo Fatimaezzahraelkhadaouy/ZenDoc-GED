@@ -194,6 +194,7 @@ zendoc-ged/
 ├── .env.example
 ├── Guide_Utilisateur_ZenDoc.pdf  # User guide (French)
 └── .gitignore
+├── *.png                        # Screenshots used in this README
 ```
 
 ---
