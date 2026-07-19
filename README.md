@@ -195,7 +195,7 @@ zendoc-ged/
 ├── Guide_Utilisateur_ZenDoc.pdf  # User guide (French)
 ├── LICENSE
 └── .gitignore
-```
+├── *.png                        # Screenshots used in this README
 
 ---
 
