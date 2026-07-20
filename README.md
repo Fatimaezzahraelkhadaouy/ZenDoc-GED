@@ -204,6 +204,82 @@ zendoc-ged/
 
 8 relational tables: `users`, `documents`, `categories`, `tags`, `document_tags`, `historique`, `permissions`, `feedback`.
 
+```mermaid
+erDiagram
+    USERS ||--o{ DOCUMENTS : uploads
+    USERS ||--o{ HISTORIQUE : performs
+    USERS ||--o{ PERMISSIONS : has
+    USERS ||--o{ FEEDBACK : gives
+    CATEGORIES ||--o{ DOCUMENTS : classifies
+    CATEGORIES ||--o{ PERMISSIONS : scopes
+    DOCUMENTS ||--o{ DOCUMENT_TAGS : tagged_with
+    TAGS ||--o{ DOCUMENT_TAGS : applied_to
+    DOCUMENTS ||--o{ HISTORIQUE : logged_in
+
+    USERS {
+        int id PK
+        string nom_complet
+        string email
+        string mot_de_passe
+        string role
+        datetime date_creation
+        bool actif
+    }
+    CATEGORIES {
+        int id PK
+        string nom
+        string description
+        string couleur
+    }
+    DOCUMENTS {
+        int id PK
+        string nom_original
+        string chemin_fichier
+        string type_fichier
+        int taille
+        int categorie_id FK
+        int uploaded_by FK
+        datetime date_upload
+        datetime date_suppression
+        text resume_ia
+        text contenu_extrait
+        string embedding_id
+    }
+    TAGS {
+        int id PK
+        string nom
+    }
+    DOCUMENT_TAGS {
+        int document_id FK
+        int tag_id FK
+    }
+    HISTORIQUE {
+        int id PK
+        int utilisateur_id FK
+        int document_id FK
+        string action
+        string details
+        datetime date_action
+    }
+    PERMISSIONS {
+        int id PK
+        int utilisateur_id FK
+        int categorie_id FK
+        bool peut_lire
+        bool peut_ajouter
+        bool peut_supprimer
+    }
+    FEEDBACK {
+        int id PK
+        int utilisateur_id FK
+        text question
+        text reponse
+        int score_ia
+        bool feedback_utilisateur
+        datetime date_creation
+    }
+```
+
 Key design points:
 - **Soft-delete** on documents (`date_suppression`), enabling restore from trash without data loss
 - **Full audit trail** via the `historique` table, linked to both user and document for complete traceability
