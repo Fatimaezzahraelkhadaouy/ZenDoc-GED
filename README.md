@@ -137,11 +137,11 @@ source venv/bin/activate      # On Windows: venv\Scripts\activate
 pip install -r requirements.txt
 
 # 4. Configure environment variables
-cp .env.example .env
+cp .env.example .env          # On Windows: copy .env.example .env
 # Then edit .env and add your Gemini API key
 
-# 5. Initialize the database
-python -m app.db.seed_data
+# 5. Initialize the database (creates tables + seeds default categories)
+python -c "from app.db.database import init_db; from app.db.seed_data import peupler_categories; init_db(); peupler_categories()"
 
 # 6. Run the application
 python main_web.py
@@ -189,7 +189,7 @@ zendoc-ged/
 │       ├── static/            # CSS, JS, images
 │       └── templates/         # Jinja2 templates
 ├── main_web.py                  # Entry point — run this to start the app
-├── main.py                      # Alternate/desktop entry point
+├── main.py                      # Alternative entry point (see file for details)
 ├── requirements.txt
 ├── .env.example
 ├── Guide_Utilisateur_ZenDoc.pdf  # User guide (French)
