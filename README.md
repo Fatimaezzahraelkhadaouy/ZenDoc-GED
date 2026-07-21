@@ -188,16 +188,17 @@ zendoc-ged/
 │       ├── routes.py          # Flask routes
 │       ├── static/            # CSS, JS, images
 │       └── templates/         # Jinja2 templates
-├── main_web.py                  # Entry point — run this to start the app
-├── main.py                      # Alternative entry point (see file for details)
-├── requirements.txt
 ├── .env.example
+└── .gitignore
 ├── Guide_Utilisateur_ZenDoc.pdf  # User guide (French)
 ├── LICENSE
-├── logo.png
+├── README.md
 ├── erd.png
+├── logo.png
 ├── screenshots/                 # App screenshots used in this README
-└── .gitignore
+├── requirements.txt
+├── main.py                      # Alternative entry point (see file for details)
+└── main_web.py                  # Entry point — run this to start the app
 ```
 
 ---
