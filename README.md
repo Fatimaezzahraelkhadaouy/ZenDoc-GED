@@ -175,30 +175,30 @@ zendoc-ged/
 │   │   ├── models.py
 │   │   └── seed_data.py
 │   ├── services/              # Business logic (service layer)
-│   │   ├── document_service.py
-│   │   ├── corbeille_service.py    # Trash / soft-delete logic
-│   │   ├── historique_service.py   # Audit logging
-│   │   ├── auth_service.py
-│   │   ├── ai_service.py           # Classification & summarization (Gemini)
-│   │   ├── search_service.py       # Semantic search (ChromaDB)
-│   │   ├── rag_service.py          # RAG chat + LLM-as-judge evaluation
-│   │   └── stats_service.py
+│   │        ├── ai_service.py           # Classification & summarization (Gemini)
+│   │        ├── auth_service.py
+│   │        ├── corbeille_service.py    # Trash / soft-delete logic
+│   │        ├── document_service.py
+│   │        ├── historique_service.py   # Audit logging
+│   │        ├── rag_service.py          # RAG chat + LLM-as-judge evaluation
+│   │        ├── search_service.py       # Semantic search (ChromaDB) 
+│   │        └── stats_service.py
 │   ├── ui/                    # Desktop UI entry point
 │   └── web/
-│       ├── routes.py          # Flask routes
 │       ├── static/            # CSS, JS, images
-│       └── templates/         # Jinja2 templates
+│       ├── templates/         # Jinja2 templates
+│       └── routes.py          # Flask routes
+├── screenshots/                 # App screenshots used in this README
 ├── .env.example
-└── .gitignore
+├── .gitignore
 ├── Guide_Utilisateur_ZenDoc.pdf  # User guide (French)
 ├── LICENSE
 ├── README.md
 ├── erd.png
 ├── logo.png
-├── screenshots/                 # App screenshots used in this README
-├── requirements.txt
 ├── main.py                      # Alternative entry point (see file for details)
-└── main_web.py                  # Entry point — run this to start the app
+├── main_web.py                  # Entry point — run this to start the app
+└── requirements.txt
 ```
 
 ---
