@@ -6,7 +6,7 @@
 
 **A full-stack application combining NLP, vector search, and LLM orchestration to automate document classification, semantic retrieval, and Retrieval-Augmented Generation (RAG).**
 
-<img src="banner.png" alt="ZenDoc" width="800"/>
+<img src="screenshots/banner.png" alt="ZenDoc" width="800"/>
 
 [![Python](https://img.shields.io/badge/Python-3.10+-3776AB?logo=python&logoColor=white)](https://www.python.org/)
 [![Flask](https://img.shields.io/badge/Flask-2.x-000000?logo=flask&logoColor=white)](https://flask.palletsprojects.com/)
@@ -57,16 +57,16 @@ This project was built to apply and showcase core Data Science / AI Engineering 
 
 <table>
 <tr>
-<td width="50%"><img src="accueil.png" alt="Home"/><p align="center"><em>Home dashboard</em></p></td>
-<td width="50%"><img src="dashboard.png" alt="Analytics dashboard"/><p align="center"><em>Analytics dashboard (Chart.js)</em></p></td>
+<td width="50%"><img src="screenshots/accueil.png" alt="Home"/><p align="center"><em>Home dashboard</em></p></td>
+<td width="50%"><img src="screenshots/dashboard.png" alt="Analytics dashboard"/><p align="center"><em>Analytics dashboard (Chart.js)</em></p></td>
 </tr>
 <tr>
-<td width="50%"><img src="depot_resultat.png" alt="AI analysis"/><p align="center"><em>Automatic classification &amp; summarization (LLM)</em></p></td>
-<td width="50%"><img src="chat.png" alt="AI chat"/><p align="center"><em>RAG-based conversational assistant with cited sources</em></p></td>
+<td width="50%"><img src="screenshots/depot_resultat.png" alt="AI analysis"/><p align="center"><em>Automatic classification &amp; summarization (LLM)</em></p></td>
+<td width="50%"><img src="screenshots/chat.png" alt="AI chat"/><p align="center"><em>RAG-based conversational assistant with cited sources</em></p></td>
 </tr>
 <tr>
-<td width="50%"><img src="recherche.png" alt="Semantic search"/><p align="center"><em>Semantic search (vector embeddings)</em></p></td>
-<td width="50%"><img src="historique.png" alt="Activity log"/><p align="center"><em>Full audit trail / operations history</em></p></td>
+<td width="50%"><img src="screenshots/recherche.png" alt="Semantic search"/><p align="center"><em>Semantic search (vector embeddings)</em></p></td>
+<td width="50%"><img src="screenshots/historique.png" alt="Activity log"/><p align="center"><em>Full audit trail / operations history</em></p></td>
 </tr>
 </table>
 
@@ -75,9 +75,9 @@ This project was built to apply and showcase core Data Science / AI Engineering 
 <br>
 <table>
 <tr>
-<td width="33%"><img src="mes_documents.png" alt="My documents"/></td>
-<td width="33%"><img src="corbeille.png" alt="Trash"/></td>
-<td width="33%"><img src="connexion.png" alt="Login"/></td>
+<td width="33%"><img src="screenshots/mes_documents.png" alt="My documents"/></td>
+<td width="33%"><img src="screenshots/corbeille.png" alt="Trash"/></td>
+<td width="33%"><img src="screenshots/connexion.png" alt="Login"/></td>
 </tr>
 </table>
 </details>
@@ -194,7 +194,9 @@ zendoc-ged/
 ├── .env.example
 ├── Guide_Utilisateur_ZenDoc.pdf  # User guide (French)
 ├── LICENSE
-├── *.png                        # Screenshots used in this README
+├── logo.png
+├── erd.png
+├── screenshots/                 # App screenshots used in this README
 └── .gitignore
 ```
 
